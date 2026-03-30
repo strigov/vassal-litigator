@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+._*
+
+# Claude local settings
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Case data (never commit real case files)
+cases/

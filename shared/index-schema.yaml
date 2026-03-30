@@ -1,0 +1,65 @@
+# Схема index.yaml v2
+# Единый реестр всех документов дела.
+
+version: 2
+last_updated: "2026-03-26T14:30:00"    # ISO datetime, обновляется при каждом изменении
+
+documents:
+  - id: "doc-001"                        # Уникальный ID, формат: doc-{NNN}
+    file: "относительный/путь/к/файлу"   # Путь от корня папки дела
+    mirror: "mirrors/doc-001.md"          # Путь к md-зеркалу от .vassal/
+    type: "договор"                       # Из таксономии (см. conventions.md)
+    title: "Название документа"
+    date: "2025-06-01"                    # Дата документа (ГГГГ-ММ-ДД)
+
+    parties:                              # Стороны документа
+      - "ООО «Ромашка»"                  # Простой формат для большинства
+      # Или развёрнутый для писем/претензий:
+      # - from: "ООО «Ромашка»"
+      #   to: "ООО «Лютик»"
+
+    summary: "Краткое описание в 1-3 предложениях"
+
+    # Реквизиты
+    seal: false                           # Есть ли печать
+    signature: false                      # Есть ли подпись
+    completeness: "full"                  # full | partial | fragment
+    quality: "high"                       # high | medium | low (качество текста/скана)
+    needs_manual_review: false            # true если OCR дал низкое качество
+    pages: null                           # Количество страниц (число)
+
+    source: "client"                      # client | opponent | court | public
+    added: "2026-03-26"                   # Дата добавления в индекс
+    processed_by: "haiku"                 # Модель, обработавшая документ
+
+    # Происхождение файла
+    origin:
+      name: "исходное_имя.pdf"           # Имя файла как получено (до переименования)
+      received: "2026-03-26"             # Дата получения
+      intake_batch: "intake-2026-03-26"  # Имя пакета (папка в raw/)
+
+    # Целостность зеркала
+    mirror_stale: false                   # true если файл изменился после создания зеркала
+    last_verified: "2026-03-26"          # Дата последней проверки
+
+    # Бандлы
+    bundle_id: null                       # ID бандла, если документ входит в группу
+    parent_id: null                       # ID родительского документа (для приложений)
+    role_in_bundle: null                  # main | appendix | exhibit
+
+    # Процессуальный статус
+    filing_status: null                   # null | draft | submitted | filed
+    filing_folder: null                   # Путь к процессуальной папке
+
+    tags: []                              # Произвольные теги
+
+# Бандлы — группы связанных документов
+bundles:
+  # - id: "bundle-001"
+  #   title: "Исковое заявление с приложениями"
+  #   main_doc: "doc-010"
+  #   members: ["doc-010", "doc-011", "doc-012"]
+
+# Счётчики
+next_id: 1                               # Следующий ID для нового документа
+next_bundle_id: 1                        # Следующий ID для нового бандла

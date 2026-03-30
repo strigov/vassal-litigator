@@ -1,0 +1,73 @@
+# Схема case.yaml v2
+# Этот файл описывает структуру карточки дела.
+# При создании case.yaml через init-case — заполни известные поля, остальные оставь null.
+
+version: 2
+
+case:
+  number: "А33-12345/2026"         # Номер дела. null если дело ещё не возбуждено.
+  court: "Название суда"            # Полное название суда
+  judge: "ФИО судьи"               # null если неизвестно
+  category: "экономические споры"   # экономические споры | банкротство | административные
+  subject: "Суть спора в 1 предложении"
+  status: active                    # active | suspended | completed | archived
+
+  # Даты
+  filing_date: null                 # Дата подачи иска (ГГГГ-ММ-ДД)
+  next_hearing: null                # Дата следующего заседания
+  next_hearing_source: null         # user | transcript | kad — кто установил дату
+
+  # Стороны
+  # Каждая сторона имеет стабильный party_id для ссылок из других структур.
+  # Формат party_id: {role}-{NN}, например plaintiff-01, defendant-01, third-party-01
+  parties:
+    - party_id: "plaintiff-01"
+      role: "Истец"                 # Истец | Ответчик | Третье лицо | Заявитель | Заинтересованное лицо
+      name: "Полное наименование"
+      short_name: "Краткое"
+      inn: null                     # ИНН (10 или 12 цифр)
+      ogrn: null                    # ОГРН (13 или 15 цифр)
+      address: null                 # Юридический адрес
+      representative: null          # ФИО представителя стороны
+
+    - party_id: "defendant-01"
+      role: "Ответчик"
+      name: "Полное наименование"
+      short_name: "Краткое"
+      inn: null
+      ogrn: null
+      address: null
+      representative: null
+
+  # Наш клиент — ссылка на party_id
+  our_client:
+    party_id: "defendant-01"        # Какая из сторон — наш клиент
+
+  # Представитель (наш юрист)
+  representative:
+    name: null                      # ФИО
+    short_name: null                # Инициалы: "Я. А. Стригов"
+    position: "Представитель"
+    power_of_attorney: null         # "Доверенность от ДД.ММ.ГГГГ"
+    address: null
+    phone: null
+    email: null
+
+  # Суммы
+  amounts:
+    claim: null                     # Сумма иска (число)
+    court_fee: null                 # Госпошлина (число)
+
+  # Досудебный порядок — заполняется на этапе legal-review, не при init-case
+  pretrial:
+    required: null                  # true | false | null
+    required_source: null           # user | agent | document
+    complied: null                  # true | false | null
+    complied_source: null           # user | agent
+    pretrial_date: null             # Дата направления претензии
+
+  # Хронология (пополняется по ходу дела)
+  timeline:
+    - date: null                    # ГГГГ-ММ-ДД
+      event: "Описание события"
+      source: user                  # user | transcript | agent
