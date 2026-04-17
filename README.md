@@ -38,8 +38,13 @@
 Скачайте `.plugin`-файл из [Releases](../../releases) или клонируйте репозиторий:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/vassal-litigator.git
+git clone https://github.com/strigov/vassal-litigator.git
 ```
+И попросите Claude Cowork или Claude Code собрать вам плагин. У вас должен быть 
+
+После чего откройте Cowork → Customize (в боковой панели) → Plugins (в боковой панели) → Personal (вкладка справа) → + (кнопка ниже) → Upload Plugin. 
+
+В появившееся окно перетащите архив vassal-litigator.zip. Принимается только zip файл.
 
 ### 2. Установите зависимости
 
