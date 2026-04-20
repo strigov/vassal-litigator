@@ -8,10 +8,10 @@ phases:
     status: done
   - id: Ф1
     scope: "Codex-инфраструктура плагина: скилл codex-invocation (включая контракт путей [PLUGIN_ROOT]/[CASE_ROOT]), директория prompts/ с _preamble.md и 8 ролевыми шаблонами, описание plugin.json, манифест зависимостей. Version bump перенесён в Ф7."
-    status: in-progress
+    status: done
   - id: Ф2
     scope: "Файловый пайплайн на Codex medium — часть 1: intake + update-index (Codex с --write сам исполняет pipeline, Python-скрипты остаются)"
-    status: pending
+    status: in-progress
   - id: Ф3
     scope: "Файловый пайплайн — часть 2: catalog + add-evidence + add-opponent (та же схема, catalog включает генерацию xlsx в Codex)"
     status: pending
