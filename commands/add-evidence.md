@@ -4,10 +4,11 @@ description: Прием дополнительных доказательств 
 
 # add-evidence -- Прием дополнительных доказательств
 
-Когда пользователь запускает эту команду с "$ARGUMENTS":
+Когда пользователь запускает эту команду:
 
-1. Прочитай скилл `skills/add-evidence/SKILL.md` и следуй его инструкциям.
-2. Если `$ARGUMENTS` содержит пояснения -- учти их при категоризации.
-3. Убедись, что `.vassal/case.yaml` и `.vassal/index.yaml` существуют. Если нет -- предложи сначала `/vassal-litigator:init-case` и `/vassal-litigator:intake`.
-4. Запусти `scripts/setup.sh` для установки OCR-зависимостей (если не запущен в этой сессии).
-5. Выполни pipeline из SKILL.md: сохранение -> извлечение -> preview -> apply -> очистка.
+1. Убедись что `.vassal/case.yaml` существует. Если нет — предложи `/vassal-litigator:init-case` и остановись.
+2. Прочитай `skills/add-evidence/SKILL.md`. Следуй Фазе 1 (Preview, read-only): список файлов из `Входящие документы/`, план переименований.
+3. Покажи preview Сюзерену. Жди подтверждения.
+4. После подтверждения: убедись что OCR-зависимости установлены (env-setup, не изменяет файлы дела). Если `setup.sh` не запускался — выполни `bash [PLUGIN_ROOT]/scripts/setup.sh`.
+5. Прочитай `skills/codex-invocation/SKILL.md`. Следуй Фазе 3 (Apply via Codex medium --write).
+6. После терминации Codex: следуй Фазе 4 (Верификация). Покажи резюме.
