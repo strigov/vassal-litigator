@@ -1,7 +1,7 @@
 ---
 slug: codex-integration-v0.5.0
 created: 2026-04-20
-status: in-progress
+status: done
 phases:
   - id: Ф0
     scope: "Research + инвентаризация: $imagegen через companion.mjs, длинные промпты, openai-codex зависимость, UTF-8, valid YAML, длина контекста"
@@ -29,7 +29,7 @@ phases:
     status: done
   - id: Ф8
     scope: "Fixture + smoke-тесты: tests/fixtures/dummy-case/ + tests/smoke/*.sh для ручной проверки каждого скилла (опционально — зависит от выводов Ф0)"
-    status: in-progress
+    status: done
 ---
 
 ## Goal
