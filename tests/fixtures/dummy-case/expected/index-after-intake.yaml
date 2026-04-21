@@ -1,0 +1,11 @@
+# Ожидаемые КЛЮЧЕВЫЕ ПОЛЯ в index.yaml после успешного intake
+# Не полный index — только для сверки
+_check:
+  - field: "docs[0].doc_type"
+    expected: "договор"
+  - field: "docs[0].origin"
+    expected: "client"
+  - field: "docs[0].mirror_stale"
+    expected: false
+  - field: "docs[0].needs_manual_review"
+    expected: false

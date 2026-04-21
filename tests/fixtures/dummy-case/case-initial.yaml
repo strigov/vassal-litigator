@@ -1,0 +1,11 @@
+case_number: "А41-1234/2025"
+case_subject: "Взыскание задолженности по договору поставки"
+our_client:
+  name: "ООО \"Ромашка\""
+  role: "истец"
+opponent:
+  name: "ООО \"Лютик\""
+  role: "ответчик"
+court: "Арбитражный суд Московской области"
+next_hearing: null
+timeline: []
