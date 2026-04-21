@@ -23,10 +23,10 @@ phases:
     status: done
   - id: Ф6
     scope: "Ревью Codex xhigh в аналитических скиллах: legal-review, build-position, prepare-hearing, draft-judgment, appeal, cassation — одно ревью (spec+quality)"
-    status: in-progress
+    status: done
   - id: Ф7
     scope: "Документация и версионирование: ARCHITECTURE §7.2/§14/§15, README (предупреждение о конфиденциальности, prerequisite), CHANGELOG 0.5.0, plugin.json"
-    status: pending
+    status: in-progress
   - id: Ф8
     scope: "Fixture + smoke-тесты: tests/fixtures/dummy-case/ + tests/smoke/*.sh для ручной проверки каждого скилла (опционально — зависит от выводов Ф0)"
     status: pending

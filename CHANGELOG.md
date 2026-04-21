@@ -1,3 +1,28 @@
+## [vassal-litigator] v0.5.0 -- 2026-04-21
+
+### Breaking changes
+- Отправка материалов дела в OpenAI через Codex CLI. Отменён принцип «всё локально» из v0.4.0. См. README «Конфиденциальность».
+- Haiku-субагенты удалены из файлового пайплайна — заменены на Codex medium с `--write`.
+- Требуется установка плагина openai-codex ≥ 1.0.3 и `codex login`.
+
+### Added
+- Скилл `codex-invocation` — единый контракт вызова Codex CLI; контракт путей `[PLUGIN_ROOT]`/`[CASE_ROOT]`.
+- Директория `prompts/` с преамбулой `_preamble.md` и шаблонами для четырёх ролей Codex.
+- Скилл `timeline` + команда `/vassal-litigator:timeline` — построение юридической хронологии на Codex high. Выход: `Хронология дела.md` (Mermaid + таблица) + `case.yaml.timeline`.
+- Скилл `visualize` — визуализация через `$imagegen` (gpt-image-1.5) как sidecar-превью в `.vassal/visuals/`. Картинки AI-generated, не доказательство, не индексируются, не встраиваются в процессуальные и аналитические документы по умолчанию.
+- Контрольное ревью Codex xhigh в 6 аналитических скиллах в аудируемом формате (Категория, Замечание, Фактическое основание с цитатой, Правовое основание, Источники doc-NNN, Уверенность, Недостающие данные, Что проверить). Артефакты ревью в `.vassal/reviews/`.
+- `scripts/generate_table.py` — helper для генерации `.vassal/Таблица документов.xlsx` (fallback: CSV).
+- Расширена схема событий timeline в `shared/case-schema.yaml`: поля `docs`, `legal_consequence`, `visual_group`.
+
+### Changed
+- Скиллы `intake`, `catalog`, `update-index`, `add-evidence`, `add-opponent` — файловый пайплайн теперь на Codex medium. Preview строит Claude-main (read-only, без OCR и файловых операций); apply — Codex с `--write` после подтверждения Сюзерена.
+- Скиллы `legal-review`, `build-position`, `prepare-hearing`, `draft-judgment`, `appeal`, `cassation` — добавлена фаза контрольного ревью Codex xhigh между Preview и Apply.
+- ARCHITECTURE.md — §7.2 маршрутизация моделей переписана; §14 п.6 обновлён (конфиденциальность); добавлен §15 «Интеграция с Codex CLI».
+
+### Removed
+- Haiku-модель из всех скиллов.
+- Принцип «обработка локально» из ARCHITECTURE §14 п.6.
+
 ## [vassal-litigator] v0.4.0 -- 2026-03-27
 
 ### Added
