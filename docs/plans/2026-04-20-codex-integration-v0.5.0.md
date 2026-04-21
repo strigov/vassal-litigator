@@ -14,10 +14,10 @@ phases:
     status: done
   - id: Ф3
     scope: "Файловый пайплайн — часть 2: catalog + add-evidence + add-opponent (та же схема, catalog включает генерацию xlsx в Codex)"
-    status: in-progress
+    status: done
   - id: Ф4
     scope: "Таймлайн: скилл timeline + команда + промпт timeline-builder (Codex high), выход — Хронология дела.md + case.yaml.timeline + Mermaid"
-    status: pending
+    status: in-progress
   - id: Ф5
     scope: "Визуализации через $imagegen (sidecar-only): скилл visualize, промпт imagegen-visualizer, интеграция в legal-review / build-position / timeline. Жёсткое требование v0.5.0, stub-вариант исключён. analyze-hearing — не трогаем."
     status: pending
