@@ -148,6 +148,37 @@ description: >
 
 8. Дождись подтверждения. Если Сюзерен корректирует — внеси правки.
 
+### Фаза 3.5 — Контрольное ревью (Codex xhigh, read-only)
+
+1. Сохрани черновик позиции в `.vassal/drafts/{ГГГГ-ММ-ДД}-build-position-draft.md`.
+2. Прочитай `skills/codex-invocation/SKILL.md`.
+3. Собери prompt из `prompts/analytical-reviewer.md`, подставь:
+   - `output_path`: `.vassal/drafts/{ГГГГ-ММ-ДД}-build-position-draft.md`
+   - `original_input`: вводная Сюзерена (за кого работаем, требования, акценты)
+   - `case_root`, `plugin_root`, `extra_constraints`, `report_contract` — по стандарту
+4. Проверь: `grep -c "{{"` → `0`.
+5. Диспатч: `codex-companion.mjs task --background --effort xhigh` (БЕЗ `--write`).
+6. Мониторь статус (until/case loop, sleep 25). Fetch result.
+7. Разбор результата:
+   - `REVIEW_OK` → переходи к фазе 4 (Apply). `NITS` покажи Сюзерену как `ℹ️ FYI`.
+   - `REVIEW_BLOCKING` → сохрани `.vassal/reviews/{ГГГГ-ММ-ДД}-build-position.md` с фронтматтером:
+     ```yaml
+     ---
+     skill: build-position
+     target_output: .vassal/drafts/{ГГГГ-ММ-ДД}-build-position-draft.md
+     reviewer: codex-xhigh
+     reviewed_at: <ISO datetime>
+     verdict: REVIEW_BLOCKING
+     blocking_count: <N>
+     nits_count: <M>
+     ---
+     ```
+     Покажи Сюзерену 3 опции:
+     - `(a)` принять как есть — продолжить apply с этим черновиком
+     - `(b)` один Opus фикс — отправить черновик на доработку
+     - `(c)` вручную — самостоятельно отредактировать черновик
+     Если выбран `(b)` — выполни один раунд доработки по BLOCKING-блокам и затем возобнови с фазы 3.5. Если выбран `(a)` — добавь `<!-- reviewed: accepted-over-objection -->` в черновик. Если выбран `(c)` — жди правки.
+
 ### Фаза 4 — Apply
 
 **Два уровня сохранения:**
@@ -242,4 +273,4 @@ supersedes: null | "{путь к предыдущей позиции}"
 
 - **Opus**: весь анализ (фаза 2) — стратегическая юридическая работа.
 - **Sonnet**: preview, форматирование, сохранение.
-- **Haiku**: не используется.
+- **Codex xhigh**: контрольное ревью (фаза 3.5) — read-only, аудируемый формат BLOCKING.

@@ -156,6 +156,56 @@ description: >
 
 8. Дождись подтверждения. Если Сюзерен корректирует — внеси правки.
 
+### Фаза 3.5 — Контрольное ревью (Codex xhigh, read-only)
+
+1. Сохрани черновик анализа во временный файл `.vassal/drafts/{ГГГГ-ММ-ДД}-legal-review-draft.md` (создай директорию, если нет).
+2. Прочитай `skills/codex-invocation/SKILL.md`.
+3. Собери prompt из `prompts/analytical-reviewer.md`, подставь:
+   - `case_root`: абсолютный путь к делу
+   - `plugin_root`: по 3-tier fallback
+   - `output_path`: путь к черновику `.vassal/drafts/{ГГГГ-ММ-ДД}-legal-review-draft.md`
+   - `original_input`: вводная Сюзерена (вопросы/запрос)
+   - `extra_constraints`: пусто
+   - `report_contract`: из `prompts/_preamble.md`
+4. Проверь: `grep -c "{{"` → `0`.
+5. Диспатч: `codex-companion.mjs task --background --effort xhigh` (БЕЗ `--write` — ревью read-only).
+6. Мониторь статус (until/case loop, sleep 25). Fetch result.
+7. Разбор результата:
+   - Если первая строка `REVIEW_OK`:
+     - переходи к фазе 4 (Apply)
+     - покажи Сюзерену `NITS` (если есть) как `ℹ️ FYI`
+   - Если первая строка `REVIEW_BLOCKING`:
+     - подсчитай количество BLOCKING-блоков и NITS
+     - сохрани полный отчёт в `.vassal/reviews/{ГГГГ-ММ-ДД}-legal-review.md` с фронтматтером:
+       ```yaml
+       ---
+       skill: legal-review
+       target_output: .vassal/drafts/{ГГГГ-ММ-ДД}-legal-review-draft.md
+       reviewer: codex-xhigh
+       reviewed_at: <ISO datetime>
+       verdict: REVIEW_BLOCKING
+       blocking_count: <N>
+       nits_count: <M>
+       ---
+       ```
+     - покажи Сюзерену summary:
+       ```text
+       Ревью выявило N блокирующих замечаний:
+       - <тема BLOCKING 1>
+       - <тема BLOCKING 2>
+       ...
+       Полный отчёт: .vassal/reviews/{ГГГГ-ММ-ДД}-legal-review.md
+
+       Варианты:
+       (a) Принять как есть — продолжить apply с этим черновиком
+       (b) Один раунд Opus фикса — отправить черновик на доработку
+       (c) Вручную — самостоятельно отредактировать черновик
+       ```
+     - дождись выбора
+     - если `(b)` — один раунд Opus на основе BLOCKING-блоков, без цикла; после этого возобнови с фазы 3.5
+     - если `(a)` — добавь `<!-- reviewed: accepted-over-objection -->` в черновик
+     - если `(c)` — жди правки
+
 ### Фаза 4 — Apply
 
 **Два уровня сохранения:**
@@ -217,6 +267,13 @@ description: >
     - сообщи Сюзерену: `Схема сторон сохранена в .vassal/visuals/{ГГГГ-ММ-ДД}-parties-scheme.png`
     - правило: НЕ добавляй ссылку на картинку в правовое заключение и ни в какой другой документ дела
 
+**d) Артефакт контрольного ревью**
+
+Если фаза 3.5 выполнялась, сохрани или обнови `.vassal/reviews/{ГГГГ-ММ-ДД}-legal-review.md`:
+- если результат был `REVIEW_OK` и файла ещё нет — создай review-артефакт с тем же фронтматтером, но `verdict: REVIEW_OK`, `blocking_count: 0`, `nits_count: <M>`
+- если результат был `REVIEW_BLOCKING`, а Сюзерен выбрал `(a)` — сохрани `verdict: REVIEW_BLOCKING` и добавь явную пометку `accepted-over-objection`
+- если результат был `REVIEW_BLOCKING`, а после одного раунда Opus замечания сняты — обнови verdict на `REVIEW_OK`
+
 11. Спроси Сюзерена: «Сформировать .docx?» Если да — используй скилл `arbitrum-docx` для оформления.
 
 ## Выходные файлы
@@ -248,4 +305,4 @@ description: >
 
 - **Opus**: весь правовой анализ (фаза 2) — сложная аналитическая работа.
 - **Sonnet**: preview, форматирование, сохранение файлов.
-- **Haiku**: не используется в этом скилле.
+- **Codex xhigh**: контрольное ревью (фаза 3.5) — read-only, аудируемый формат BLOCKING.
