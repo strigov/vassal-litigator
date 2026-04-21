@@ -20,10 +20,10 @@ phases:
     status: done
   - id: Ф5
     scope: "Визуализации через $imagegen (sidecar-only): скилл visualize, промпт imagegen-visualizer, интеграция в legal-review / build-position / timeline. Жёсткое требование v0.5.0, stub-вариант исключён. analyze-hearing — не трогаем."
-    status: in-progress
+    status: done
   - id: Ф6
     scope: "Ревью Codex xhigh в аналитических скиллах: legal-review, build-position, prepare-hearing, draft-judgment, appeal, cassation — одно ревью (spec+quality)"
-    status: pending
+    status: in-progress
   - id: Ф7
     scope: "Документация и версионирование: ARCHITECTURE §7.2/§14/§15, README (предупреждение о конфиденциальности, prerequisite), CHANGELOG 0.5.0, plugin.json"
     status: pending
