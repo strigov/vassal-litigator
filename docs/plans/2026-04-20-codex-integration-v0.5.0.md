@@ -11,10 +11,10 @@ phases:
     status: done
   - id: Ф2
     scope: "Файловый пайплайн на Codex medium — часть 1: intake + update-index (Codex с --write сам исполняет pipeline, Python-скрипты остаются)"
-    status: in-progress
+    status: done
   - id: Ф3
     scope: "Файловый пайплайн — часть 2: catalog + add-evidence + add-opponent (та же схема, catalog включает генерацию xlsx в Codex)"
-    status: pending
+    status: in-progress
   - id: Ф4
     scope: "Таймлайн: скилл timeline + команда + промпт timeline-builder (Codex high), выход — Хронология дела.md + case.yaml.timeline + Mermaid"
     status: pending
