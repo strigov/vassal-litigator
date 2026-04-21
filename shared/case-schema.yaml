@@ -68,6 +68,15 @@ case:
 
   # Хронология (пополняется по ходу дела)
   timeline:
-    - date: null                    # ГГГГ-ММ-ДД
-      event: "Описание события"
-      source: user                  # user | transcript | agent
+    # Старый формат (deprecated, используй новый):
+    # - date: null                  # ГГГГ-ММ-ДД
+    #   event: "Описание события"
+    #   source: user                # user | transcript | agent
+    # Пример полного события:
+    - date: "2025-06-01"            # ГГГГ-ММ-ДД | ГГГГ-ММ | ГГГГ
+      event: "Заключён договор поставки №47 между ООО Ромашка и ООО Лютик"
+      source: agent                 # user | transcript | agent
+      docs:
+        - "Договор поставки №47 от 01.06.2025"
+      legal_consequence: "Начало обязательства ООО Лютик принять и оплатить товар в течение 30 дней с момента поставки"
+      visual_group: "preparation"   # preparation | dispute | litigation | appeal | null
