@@ -176,10 +176,10 @@ rm "Входящие документы/файл.pdf"
 
 | Условие | `ocr_quality` |
 |---|---|
-| `extraction_method ∈ {text, docx, xlsx}` | `ok` |
-| `extraction_method == tesseract` и `confidence ≥ 0.75` и ≥ 200 символов/стр в среднем | `ok` |
-| `extraction_method == tesseract` и (`confidence < 0.75` или < 200 симв/стр) | `low` |
-| `extraction_method == tesseract` и всего < 50 символов | `empty` |
+| `extraction_method ∈ {pdf-text, docx-parse, text-read}` | `ok` |
+| `extraction_method == ocr` и `confidence ≥ 0.75` и ≥ 200 символов/стр в среднем | `ok` |
+| `extraction_method == ocr` и (`confidence < 0.75` или < 200 симв/стр) | `low` |
+| `extraction_method == ocr` и всего < 50 символов | `empty` |
 | `extraction_method == haiku-vision` и `confidence ≥ 0.75` и ≥ 200 символов/стр в среднем | `ok` (с `ocr_reattempted: true`) |
 | `extraction_method == haiku-vision` и (`confidence < 0.75` или < 200 симв/стр) | `low` (с `ocr_reattempted: true`, `reason: "re-OCR via haiku-vision still low"`) |
 | Поле отсутствует (дело `v0.5.x`) | трактуется как `ok` (презумпция) |
