@@ -7,7 +7,7 @@ last_updated: "2026-03-26T14:30:00"    # ISO datetime, обновляется п
 documents:
   - id: "doc-001"                        # Уникальный ID, формат: doc-{NNN}
     file: "относительный/путь/к/файлу"   # Путь от корня папки дела
-    mirror: "mirrors/doc-001.md"          # Путь к md-зеркалу от .vassal/
+    mirror: ".vassal/mirrors/doc-001.md"  # Путь к md-зеркалу от корня папки дела
     type: "договор"                       # Из таксономии (см. conventions.md)
     title: "Название документа"
     date: "2025-06-01"                    # Дата документа (ГГГГ-ММ-ДД)
@@ -36,16 +36,21 @@ documents:
     origin:
       name: "исходное_имя.pdf"           # Имя файла как получено (до переименования)
       received: "2026-03-26"             # Дата получения
-      intake_batch: "intake-2026-03-26"  # Имя пакета (папка в raw/)
+      batch: "intake-2026-03-26"         # Имя пакета (папка в raw/)
+      archive_src: "архив.zip"           # Опционально: исходный архив, если документ извлечён из него
 
     # Целостность зеркала
     mirror_stale: false                   # true если файл изменился после создания зеркала
+    ocr_quality: "ok"                     # Опционально: ok | low | empty
+    ocr_quality_reason: ""                # Опционально: для ok всегда "", для low/empty — причина
+    ocr_reattempted: false                # Опционально: была ли повторная OCR-попытка
     last_verified: "2026-03-26"          # Дата последней проверки
 
     # Бандлы
     bundle_id: null                       # ID бандла, если документ входит в группу
     parent_id: null                       # ID родительского документа (для приложений)
-    role_in_bundle: null                  # main | appendix | exhibit
+    role_in_bundle: null                  # head | attachment
+    attachment_order: null                # Порядок документа внутри комплекта
 
     # Процессуальный статус
     filing_status: null                   # null | draft | submitted | filed

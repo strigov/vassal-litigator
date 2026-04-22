@@ -1,11 +1,65 @@
-# Ожидаемые КЛЮЧЕВЫЕ ПОЛЯ в index.yaml после успешного intake
-# Не полный index — только для сверки
+# Ожидаемые поля в .vassal/index.yaml после успешного intake
+# (v1.0.0 контракт: plan → review → apply → verify)
+#
+# Это не полный index — это контракт на присутствие обязательных полей.
+# Конкретные значения (date, parties, title) зависят от OCR и классификации
+# plan-фазы; smoke-тест проверяет только структуру и инварианты.
+
 _check:
-  - field: "docs[0].doc_type"
-    expected: "договор"
-  - field: "docs[0].origin"
+  # Структура индекса
+  - field: "version"
+    expected: 2
+  - field: "next_id"
+    kind: "integer >= 7"          # после intake 5 исходных файлов + 2 извлечённых из архива
+  - field: "documents"
+    kind: "non-empty list"
+
+  # Инварианты всех записей
+  - field: "documents[*].id"
+    kind: "matches /^doc-\\d+$/"
+  - field: "documents[*].source"
     expected: "client"
-  - field: "docs[0].mirror_stale"
+  - field: "documents[*].origin.batch"
+    kind: "starts with 'intake-'"
+  - field: "documents[*].mirror_stale"
     expected: false
-  - field: "docs[0].needs_manual_review"
+  - field: "documents[*].mirror"
+    kind: "matches /^\\.vassal/mirrors/doc-\\d+\\.md$/"
+  - field: "documents[*].file"
+    kind: "starts with 'Материалы от клиента/'"
+  - field: "documents[*].ocr_quality"
+    expected: "ok"
+  - field: "documents[*].ocr_quality_reason"
+    expected: ""
+  - field: "documents[*].ocr_reattempted"
     expected: false
+
+  # Файлы, извлечённые из архива, имеют archive_src
+  - field: "documents[origin.archive_src != null].origin.archive_src"
+    kind: "not empty"
+
+  # Если скан.jpg распознан как документ — он должен быть в индексе как PDF
+  # (apply-фаза конвертирует картинку через image_to_pdf.py)
+  - field: "documents[origin.name ~ /скан/i].file"
+    kind: "ends with '.pdf'"
+
+  # Архив-оригинал НЕ индексируется (только его содержимое)
+  - field: "documents[origin.name ~ /архив\\.zip/i]"
+    kind: "not present"
+
+  # Большая фикстура обязана быть проиндексирована и получить зеркало
+  - field: "documents[origin.name == 'большой-договор.pdf']"
+    kind: "present exactly once"
+  - field: "documents[origin.name == 'большой-договор.pdf'].mirror"
+    kind: "matches /^\\.vassal/mirrors/doc-\\d+\\.md$/"
+
+  # Документы, объединённые в комплект (если план так их классифицировал),
+  # должны иметь bundle_id и role_in_bundle; приложения — также parent_id
+  - field: "documents[role_in_bundle == 'attachment'].parent_id"
+    kind: "matches /^doc-\\d+$/"
+  - field: "documents[role_in_bundle == 'attachment'].attachment_order"
+    kind: "integer >= 1"
+
+  # Сироты без даты (если появились)
+  - field: "documents[needs_manual_review == true].file"
+    kind: "starts with 'Материалы от клиента/Без даты — '"

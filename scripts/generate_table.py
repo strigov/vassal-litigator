@@ -204,6 +204,14 @@ def resolve_member_ids(doc: dict[str, Any]) -> list[str]:
     return result
 
 
+def is_head_doc(role: Any) -> bool:
+    return role in ("main", "head", "anchor")
+
+
+def is_attachment_doc(role: Any) -> bool:
+    return role in ("appendix", "exhibit", "attachment")
+
+
 def flatten_documents(documents: list[dict[str, Any]]) -> list[dict[str, Any]]:
     doc_by_id = {str(doc.get("id")): doc for doc in documents if doc.get("id")}
     index_by_id = {
@@ -222,9 +230,9 @@ def flatten_documents(documents: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if not bundle_id:
             continue
         bundle_id = str(bundle_id)
-        if doc.get("anchor") is True or doc.get("role_in_bundle") == "main":
+        if doc.get("anchor") is True or is_head_doc(doc.get("role_in_bundle")):
             bundle_anchors[bundle_id] = doc_id
-        elif doc.get("member") is True:
+        elif doc.get("member") is True or is_attachment_doc(doc.get("role_in_bundle")):
             bundle_members.setdefault(bundle_id, []).append(doc_id)
 
     processed: set[str] = set()
@@ -249,7 +257,7 @@ def flatten_documents(documents: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         explicit_members = bundle_members.get(doc_id, []).copy()
         bundle_id = doc.get("bundle_id")
-        if bundle_id and (doc.get("anchor") is True or doc.get("role_in_bundle") == "main"):
+        if bundle_id and (doc.get("anchor") is True or is_head_doc(doc.get("role_in_bundle"))):
             explicit_members.extend(bundle_members.get(str(bundle_id), []))
 
         seen_member_ids: set[str] = set()
