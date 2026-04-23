@@ -4,10 +4,11 @@ set -euo pipefail
 
 print_usage() {
     cat <<'EOF'
-USAGE: bash tests/smoke/test-catalog.sh /path/to/vassal-litigator
+USAGE: bash tests/smoke/test-catalog.sh /path/to/vassal-litigator-cc
 
-Запускать из директории внутри /tmp/.
-Скрипт готовит smoke-окружение и выводит шаги для ручной проверки catalog.
+Запускать из директории внутри /tmp/ или /private/tmp/.
+Скрипт готовит smoke-окружение, запускает generate_table.py и проверяет
+созданный артефакт каталога автоматически.
 EOF
 }
 
@@ -23,7 +24,7 @@ if [[ -z "$PLUGIN_ROOT" ]]; then
 fi
 
 case "$PWD" in
-    /tmp|/tmp/*) ;;
+    /tmp|/tmp/*|/private/tmp|/private/tmp/*) ;;
     *)
         echo "WARNING: smoke-скрипт можно запускать только из /tmp/. Текущий CWD: $PWD"
         exit 1
@@ -40,40 +41,128 @@ if [[ ! -d "$PLUGIN_ROOT/tests/fixtures/dummy-case" ]]; then
     exit 1
 fi
 
-SMOKE_CASE="/tmp/smoke-vassal-catalog-$(date +%s)"
+SMOKE_CASE="$(mktemp -d /tmp/smoke-vassal-catalog.XXXXXX)"
+trap 'rm -rf "$SMOKE_CASE"' EXIT
 
-mkdir -p "$SMOKE_CASE"
-cp -R "$PLUGIN_ROOT/tests/fixtures/dummy-case/Входящие документы" "$SMOKE_CASE/"
-cp "$PLUGIN_ROOT/tests/fixtures/dummy-case/case-initial.yaml" "$SMOKE_CASE/.vassal-case-initial.yaml"
+run_generate_table() {
+    local case_root="$1"
+    python3 "$PLUGIN_ROOT/scripts/generate_table.py" --case-root "$case_root"
+}
 
-cat <<EOF
-=== SMOKE: catalog ===
+seed_happy_case() {
+    local case_root="$1"
+    cp -R "$PLUGIN_ROOT/tests/fixtures/dummy-case/." "$case_root/"
+    mkdir -p "$case_root/.vassal" "$case_root/.vassal/mirrors"
 
-РАБОЧАЯ ДИРЕКТОРИЯ:
-$SMOKE_CASE
-
-ШАГИ:
-1. Перейди в smoke-директорию:
-   cd "$SMOKE_CASE"
-2. Открой Claude Cowork в этой папке.
-3. Если intake в этом каталоге ещё не выполнен:
-   - запусти /vassal-litigator:init-case
-   - скопируй fixture-документы во "Входящие документы/" дела
-   - запусти /vassal-litigator:intake и подтверди apply
-4. Выполни: /vassal-litigator:catalog
-5. Проверь preview: какие записи будут обогащены и что будет перезаписана "Таблица документов.xlsx".
-6. Подтверди apply.
-
-ОЖИДАЕМЫЙ РЕЗУЛЬТАТ:
-- В корне дела создана или обновлена "Таблица документов.xlsx"
-- .vassal/index.yaml обновлён: у части документов появились summary
-- .vassal/codex-logs/ содержит лог catalog
-
-ПРОВЕРКА:
-- find . -name 'Таблица документов.xlsx' -type f
-- python3 -c "import yaml, pathlib; p=next(pathlib.Path('.').glob('**/.vassal/index.yaml')); d=yaml.safe_load(p.read_text(encoding='utf-8')); docs=d.get('docs', d.get('documents', [])); print('docs=', len(docs)); print('with_summary=', sum(1 for x in docs if x.get('summary')))"
-- find . -path '*/.vassal/codex-logs/*catalog*.md' -type f
-
-ОЧИСТКА:
-rm -rf "$SMOKE_CASE"
+    cat > "$case_root/.vassal/index.yaml" <<'EOF'
+documents:
+  - id: doc-001
+    date: 2026-04-01
+    doc_type: договор
+    title: Договор поставки
+    summary: Основной договор поставки между сторонами спора.
+    parties:
+      from: ООО Ромашка
+      to: ООО Василек
+    seal: true
+    signature: true
+    completeness: full
+    quality: good
+    file: Входящие документы/договор.pdf
+  - id: doc-002
+    date: 2026-04-10
+    doc_type: претензия
+    title: Досудебная претензия
+    summary: Претензия о погашении задолженности и неустойки.
+    parties:
+      from: ООО Василек
+      to: ООО Ромашка
+    seal: false
+    signature: true
+    completeness: full
+    quality: good
+    file: Входящие документы/претензия.pdf
 EOF
+
+    cat > "$case_root/.vassal/mirrors/doc-001.md" <<'EOF'
+---
+id: doc-001
+title: Договор поставки
+---
+
+Полный текст договора поставки.
+EOF
+
+    cat > "$case_root/.vassal/mirrors/doc-002.md" <<'EOF'
+---
+id: doc-002
+title: Досудебная претензия
+---
+
+Полный текст досудебной претензии.
+EOF
+}
+
+seed_empty_documents_case() {
+    local case_root="$1"
+    mkdir -p "$case_root/.vassal" "$case_root/.vassal/mirrors"
+    cat > "$case_root/.vassal/index.yaml" <<'EOF'
+documents: []
+EOF
+}
+
+assert_catalog_output() {
+    local case_root="$1"
+    local expected_label="$2"
+    CASE_ROOT="$case_root" EXPECTED_LABEL="$expected_label" python3 - <<'PY'
+import os
+import pathlib
+import sys
+
+case_root = pathlib.Path(os.environ["CASE_ROOT"])
+expected_label = os.environ["EXPECTED_LABEL"]
+xlsx_path = case_root / "Таблица документов.xlsx"
+csv_path = case_root / "Таблица документов.csv"
+errors = []
+
+if xlsx_path.exists() and csv_path.exists():
+    errors.append(f"{expected_label}: unexpectedly found both XLSX and CSV outputs")
+
+output_path = xlsx_path if xlsx_path.exists() else csv_path if csv_path.exists() else None
+if output_path is None:
+    errors.append(
+        f"{expected_label}: expected Таблица документов.xlsx or Таблица документов.csv to exist"
+    )
+else:
+    if output_path.stat().st_size <= 0:
+        errors.append(f"{expected_label}: output file is empty: {output_path}")
+
+if errors:
+    print("FAIL:")
+    print("\n".join(errors))
+    sys.exit(1)
+
+print(f"{expected_label}: OK ({output_path.name})")
+PY
+}
+
+EMPTY_MIRRORS_CASE="$(mktemp -d /tmp/smoke-vassal-catalog-empty-mirrors.XXXXXX)"
+EMPTY_DOCS_CASE="$(mktemp -d /tmp/smoke-vassal-catalog-empty-docs.XXXXXX)"
+trap 'rm -rf "$SMOKE_CASE" "$EMPTY_MIRRORS_CASE" "$EMPTY_DOCS_CASE"' EXIT
+
+seed_happy_case "$SMOKE_CASE"
+run_generate_table "$SMOKE_CASE"
+assert_catalog_output "$SMOKE_CASE" "happy-path"
+
+seed_happy_case "$EMPTY_MIRRORS_CASE"
+rm -rf "$EMPTY_MIRRORS_CASE/.vassal/mirrors"
+mkdir -p "$EMPTY_MIRRORS_CASE/.vassal/mirrors"
+run_generate_table "$EMPTY_MIRRORS_CASE"
+assert_catalog_output "$EMPTY_MIRRORS_CASE" "empty-mirrors"
+
+seed_empty_documents_case "$EMPTY_DOCS_CASE"
+run_generate_table "$EMPTY_DOCS_CASE"
+assert_catalog_output "$EMPTY_DOCS_CASE" "empty-documents"
+
+# Проверка обогащения summary и записи в history.md требует live-сессию Claude-main,
+# поэтому остаётся вне smoke и должна подтверждаться отдельным интеграционным прогоном.
