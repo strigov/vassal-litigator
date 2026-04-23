@@ -4,10 +4,11 @@ set -euo pipefail
 
 print_usage() {
     cat <<'EOF'
-USAGE: bash tests/smoke/test-analytical-review.sh /path/to/vassal-litigator
+USAGE: bash tests/smoke/test-analytical-review.sh /path/to/vassal-litigator-cc
 
 Запускать из директории внутри /tmp/.
-Скрипт готовит smoke-окружение и выводит шаги для ручной проверки legal-review + Codex xhigh review.
+Скрипт готовит smoke-окружение и выводит шаги для ручной проверки legal-review
+по ветке Ф5a: Opus-subagent -> markdown + Mermaid -> Sonnet-subagent -> arbitrum-docx.
 EOF
 }
 
@@ -40,44 +41,95 @@ if [[ ! -d "$PLUGIN_ROOT/tests/fixtures/dummy-case" ]]; then
     exit 1
 fi
 
-SMOKE_CASE="/tmp/smoke-vassal-analytical-review-$(date +%s)"
+SMOKE_CASE="/tmp/smoke-vassal-legal-review-$(date +%s)"
 
 mkdir -p "$SMOKE_CASE"
 cp -R "$PLUGIN_ROOT/tests/fixtures/dummy-case/Входящие документы" "$SMOKE_CASE/"
 cp "$PLUGIN_ROOT/tests/fixtures/dummy-case/case-initial.yaml" "$SMOKE_CASE/.vassal-case-initial.yaml"
 
-cat <<EOF
-=== SMOKE: legal-review + xhigh review ===
+cat <<'EOF' | sed \
+    -e "s|__SMOKE_CASE__|$SMOKE_CASE|g" \
+    -e "s|__PLUGIN_ROOT__|$PLUGIN_ROOT|g"
+=== SMOKE: legal-review (contract 3.1a -> 3.2) ===
 
 РАБОЧАЯ ДИРЕКТОРИЯ:
-$SMOKE_CASE
+__SMOKE_CASE__
+
+ПРЕДУСЛОВИЯ:
+- Claude Code запущен в окружении, где доступен `Task(model=opus)`
+- Доступен formatter `arbitrum-docx`
+- В этом каталоге уже выполнены `init-case` и intake на fixture-документах,
+  либо ты сделаешь это перед запуском legal-review
 
 ШАГИ:
 1. Перейди в smoke-директорию:
-   cd "$SMOKE_CASE"
-2. Открой Claude Cowork в этой папке.
-3. Если intake ещё не выполнен в этом каталоге, сначала выполни init-case + intake на fixture-документах.
-4. Для более стабильного smoke желательно сначала выполнить /vassal-litigator:catalog.
-5. Выполни: /vassal-litigator:legal-review
-6. Проверь preview правового анализа и подтверди apply.
-7. Дождись контрольного ревью Codex xhigh.
-8. Если verdict = REVIEW_BLOCKING, проверь что Сюзерену показаны 3 опции:
-   - принять как есть
-   - один раунд Opus фикса
-   - ручная правка
+   cd "__SMOKE_CASE__"
+2. Запусти Claude Code в этой папке.
+3. Если intake ещё не выполнен, сначала сделай init-case + intake на fixture-документах.
+4. Выполни: /vassal-litigator-cc:legal-review
+5. Подтверди preview/apply.
 
 ОЖИДАЕМЫЙ РЕЗУЛЬТАТ:
-- Либо создаётся итоговый файл "{дата} Предварительный анализ документов.md"
-- Либо создаётся review-артефакт в .vassal/reviews/
-- При REVIEW_OK заключение и секции анализа сохранены в .vassal/analysis/
-- При REVIEW_BLOCKING есть аудируемый review-отчёт с BLOCKING/NITS
+- В `.vassal/analysis/` создан markdown `legal-review-YYYY-MM-DD.md`
+- В `.vassal/analysis/` создан `.docx` `legal-review-YYYY-MM-DD.docx`
+- В markdown есть секция `## Схема сторон` и блок ```mermaid
+- Последняя строка markdown: `READY_FOR_DOCX: analytical`
+- Отдельный review-артефакт не создаётся
+- В markdown нет упоминаний `Codex`, `xhigh`, `контрольное ревью`
 
 ПРОВЕРКА:
-- find . -path '*/.vassal/reviews/*.md' -type f
-- find . -path '*/.vassal/analysis/*.md' -type f
-- find . -name '*Предварительный анализ документов.md' -type f
-- python3 -c "import pathlib; files=list(pathlib.Path('.').glob('**/.vassal/reviews/*.md')); print('reviews=', len(files)); print(files[0].read_text(encoding='utf-8')[:400] if files else 'NO_REVIEWS')"
+- find . -path '*/.vassal/analysis/legal-review-*.md' -type f
+- find . -path '*/.vassal/analysis/legal-review-*.docx' -type f
+- python3 - <<'PYEOF'
+import pathlib
+import sys
+
+files = list(pathlib.Path('.').glob('**/.vassal/analysis/legal-review-*.md'))
+if not files:
+    print('FAIL: legal-review markdown not found')
+    sys.exit(1)
+
+path = files[0]
+text = path.read_text(encoding='utf-8')
+folded = text.casefold()
+checks = {
+    'schema_section': '## Схема сторон' in text,
+    'mermaid': '```mermaid' in text,
+    'ready_for_docx': text.rstrip().endswith('READY_FOR_DOCX: analytical'),
+    'no_codex': 'codex' not in folded,
+    'no_xhigh': 'xhigh' not in folded,
+    'no_control_review': 'контрольное ревью' not in folded,
+}
+print(path)
+print(checks)
+if not all(checks.values()):
+    sys.exit(1)
+PYEOF
+- python3 - <<'PYEOF'
+import pathlib
+import sys
+
+reviews = list(pathlib.Path('.').glob('**/.vassal/reviews/*.md'))
+print('review_files=', reviews)
+if reviews:
+    sys.exit(1)
+PYEOF
+- python3 - <<'PYEOF'
+import pathlib
+import sys
+
+files = list(pathlib.Path('.').glob('**/.vassal/analysis/legal-review-*.docx'))
+if not files:
+    print('FAIL: legal-review docx not found')
+    sys.exit(1)
+
+path = files[0]
+size = path.stat().st_size
+print(path, size)
+if size <= 0:
+    sys.exit(1)
+PYEOF
 
 ОЧИСТКА:
-rm -rf "$SMOKE_CASE"
+rm -rf "__SMOKE_CASE__"
 EOF
