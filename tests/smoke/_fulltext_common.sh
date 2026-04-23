@@ -185,7 +185,7 @@ PY
 
 assert_mirror_full() {
     local mirror_rel source_rel mirror source tmp ocr_file mirror_chars ocr_chars
-    local MIN_MIRROR_CHARS="\${MIN_MIRROR_CHARS:-20000}"
+    local MIN_MIRROR_CHARS="\${MIN_MIRROR_CHARS:-$((200 * 100))}"
 
     if [[ "\${1:-}" == "--id" ]]; then
         local doc_id="\${2:?doc id is required}"

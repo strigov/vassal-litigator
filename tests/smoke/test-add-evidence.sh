@@ -24,7 +24,7 @@ if [[ -z "$PLUGIN_ROOT" ]]; then
 fi
 
 case "$PWD" in
-    /tmp|/tmp/*) ;;
+    /tmp|/tmp/*|/private/tmp|/private/tmp/*) ;;
     *)
         echo "WARNING: smoke-скрипт можно запускать только из /tmp/. Текущий CWD: $PWD"
         exit 1
@@ -64,10 +64,10 @@ $SMOKE_CASE
 1. Перейди в smoke-директорию:
    cd "$SMOKE_CASE"
 2. Запусти Claude Code в этой папке.
-3. Выполни /vassal-litigator:init-case и дождись завершения базового intake на стартовой fixture-поставке.
+3. Выполни /vassal-litigator-cc:init-case и дождись завершения базового intake на стартовой fixture-поставке.
 4. Добавь новый полнотекстовый документ для догрузки:
    cp "$PAYLOAD_DIR/большой-договор-evidence.pdf" "$SMOKE_CASE/Входящие документы/большой-договор-evidence.pdf"
-5. Выполни: /vassal-litigator:add-evidence
+5. Выполни: /vassal-litigator-cc:add-evidence
 6. Проверь preview:
    - в плане есть новый документ "большой-договор-evidence.pdf"
    - для него назначен новый doc-ID
@@ -75,12 +75,12 @@ $SMOKE_CASE
 7. Подтверди apply.
 
 ОЖИДАЕМЫЙ РЕЗУЛЬТАТ:
-- создан raw-батч `.vassal/raw/evidence-ГГГГ-ММ-ДД/` с копией `большой-договор-evidence.pdf`
-- в `.vassal/index.yaml` появилась новая запись с `source: client`, `origin.batch: evidence-...`, `ocr_quality: ok`, `ocr_quality_reason: ""`, `ocr_reattempted: false`
-- для новой записи создано `.vassal/mirrors/doc-NNN.md` с полным текстом
-- `.vassal/codex-logs/` содержит архив плана add-evidence
-- `.vassal/plans/add-evidence-*.md` и `.vassal/work/add-evidence-*/` удалены
-- `Входящие документы/` снова пустая
+- создан raw-батч .vassal/raw/evidence-ГГГГ-ММ-ДД/ с копией большой-договор-evidence.pdf
+- в .vassal/index.yaml появилась новая запись с source: client, origin.batch: evidence-..., ocr_quality: ok, ocr_quality_reason: "", ocr_reattempted: false
+- для новой записи создано .vassal/mirrors/doc-NNN.md с полным текстом
+- .vassal/plans/add-evidence-*.md и .vassal/work/add-evidence-*/ удалены
+- Входящие документы/ снова пустая
+- legacy-директория .vassal/codex-logs/ может существовать только в старых делах v0.5.x, но новый add-evidence её не создаёт и не использует
 
 ПРОВЕРКА:
 - export SMOKE_CASE="$SMOKE_CASE"; export PLUGIN_ROOT="$PLUGIN_ROOT"
@@ -123,7 +123,6 @@ if errors:
 print("add-evidence OCR assertions: OK")
 PYEOF
 - assert_mirror_full "большой-договор-evidence.pdf"
-- find "\$SMOKE_CASE/.vassal/codex-logs" -name '*add-evidence-plan.md' -type f
 - ls "\$SMOKE_CASE/.vassal/plans/" 2>/dev/null; ls "\$SMOKE_CASE/.vassal/work/" 2>/dev/null
 
 ОЧИСТКА:

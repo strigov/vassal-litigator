@@ -1,8 +1,17 @@
 {
-  "name": "vassal-litigator",
-  "description": "Плагин для ведения судебных дел: приём документов, каталогизация, правовой анализ, подготовка к заседаниям, обжалование. Вассал помогает юристу на каждом этапе — от первичного приёма материалов клиента до кассационной жалобы. Инфраструктура v0.5.0 предусматривает совместную работу с openai-codex companion для файлового apply, таймлайна, sidecar-визуализаций и контрольного ревью.",
-  "version": "0.5.0",
+  "name": "vassal-litigator-cc",
+  "description": "Вассал (Claude Code edition): Claude-only плагин для ведения судебных дел. Файловый пайплайн идёт через Haiku-subagent, аналитика — через Opus-subagent, оформление .docx — через Sonnet-subagent и arbitrum-docx.",
+  "version": "0.6.0",
   "author": {
-    "name": "Ian"
-  }
+    "name": "Ian Strigov"
+  },
+  "homepage": "https://github.com/strigov/vassal-litigator-cc",
+  "repository": "https://github.com/strigov/vassal-litigator-cc",
+  "license": "GPL-3.0",
+  "keywords": [
+    "legal",
+    "litigation",
+    "russian-law",
+    "document-management"
+  ]
 }

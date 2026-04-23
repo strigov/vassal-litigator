@@ -25,7 +25,6 @@ description: >
 Вычисли один раз в начале прогона:
 
 - `run_timestamp` = текущее локальное `ГГГГ-ММ-ДД-ЧЧмм`
-- `log_path` = архивный markdown-лог update-index за текущий прогон
 - `next_id_hint` = текущее `next_id` из `.vassal/index.yaml` (если поля нет — считай `1`)
 
 ## Фаза 1 — Preview (main-Sonnet)
@@ -102,7 +101,7 @@ description: >
 
 ### Общая дисциплина apply
 
-1. После каждого успешно применённого шага записывай краткую строку в runtime-лог; по завершении сохрани сводку в `log_path`.
+1. После завершения apply запиши краткую строку в `.vassal/history.md`.
 2. После любого непустого apply-прогона проверь, что `.vassal/index.yaml` читается:
    ```bash
    python3 -c "import pathlib, yaml; yaml.safe_load(pathlib.Path('.vassal/index.yaml').read_text(encoding='utf-8'))"
@@ -121,13 +120,12 @@ description: >
    - `pdf-text`, `docx-parse`, `text-read` → `ocr_quality: ok`;
    - `ocr` с общим объёмом текста < 50 символов → `ocr_quality: empty`;
    - `ocr` с `confidence >= 0.75` и средним объёмом не меньше 200 символов на страницу → `ocr_quality: ok`, иначе `low`.
-5. Для `update-index` без отдельного re-OCR через будущий скилл `reocr` фиксируй `ocr_reattempted: false`.
+5. Для `update-index`, если отдельный `/vassal-litigator-cc:reocr` не запускался, фиксируй `ocr_reattempted: false`.
 6. Для записей с `ocr_quality: ok` всегда ставь `ocr_quality_reason: ""`. Если качество `low` или `empty`, не скрывай это в резюме: перечисли `doc-ID` и причину ручной проверки.
 7. Проверь, что:
    - новые зеркала созданы, а пересозданные зеркала обновлены;
    - для режима C `mirror_stale: false`;
-   - удалённые orphan-записи действительно исчезли из индекса;
-   - `log_path` сохранён в архиве логов плагина.
+   - удалённые orphan-записи действительно исчезли из индекса.
 8. Покажи Сюзерену итог: сколько файлов добавлено (режим A), сколько orphan-решений применено (режим B), сколько зеркал пересоздано (режим C), сколько записей получили `ocr_quality low/empty`.
 
 ## Идемпотентность

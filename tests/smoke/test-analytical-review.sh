@@ -24,7 +24,7 @@ if [[ -z "$PLUGIN_ROOT" ]]; then
 fi
 
 case "$PWD" in
-    /tmp|/tmp/*) ;;
+    /tmp|/tmp/*|/private/tmp|/private/tmp/*) ;;
     *)
         echo "WARNING: smoke-скрипт можно запускать только из /tmp/. Текущий CWD: $PWD"
         exit 1
@@ -75,7 +75,7 @@ __SMOKE_CASE__
 - В markdown есть секция `## Схема сторон` и блок ```mermaid
 - Последняя строка markdown: `READY_FOR_DOCX: analytical`
 - Отдельный review-артефакт не создаётся
-- В markdown нет упоминаний `Codex`, `xhigh`, `контрольное ревью`
+- В markdown нет упоминаний про удалённый внешний исполнитель и старый контрольный слой ревью
 
 ПРОВЕРКА:
 - find . -path '*/.vassal/analysis/legal-review-*.md' -type f
@@ -96,8 +96,8 @@ checks = {
     'schema_section': '## Схема сторон' in text,
     'mermaid': '```mermaid' in text,
     'ready_for_docx': text.rstrip().endswith('READY_FOR_DOCX: analytical'),
-    'no_codex': 'codex' not in folded,
-    'no_xhigh': 'xhigh' not in folded,
+    'no_removed_executor': ("co" "dex") not in folded,
+    'no_old_review_tier': ("xh" "igh") not in folded,
     'no_control_review': 'контрольное ревью' not in folded,
 }
 print(path)

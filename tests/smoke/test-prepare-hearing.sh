@@ -24,7 +24,7 @@ if [[ -z "$PLUGIN_ROOT" ]]; then
 fi
 
 case "$PWD" in
-    /tmp|/tmp/*) ;;
+    /tmp|/tmp/*|/private/tmp|/private/tmp/*) ;;
     *)
         echo "WARNING: smoke-скрипт можно запускать только из /tmp/. Текущий CWD: $PWD"
         exit 1

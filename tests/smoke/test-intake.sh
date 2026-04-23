@@ -24,7 +24,7 @@ if [[ -z "$PLUGIN_ROOT" ]]; then
 fi
 
 case "$PWD" in
-    /tmp|/tmp/*) ;;
+    /tmp|/tmp/*|/private/tmp|/private/tmp/*) ;;
     *)
         echo "WARNING: smoke-скрипт можно запускать только из /tmp/. Текущий CWD: $PWD"
         exit 1
@@ -62,14 +62,14 @@ cat <<EOF
 $SMOKE_CASE
 
 ПРЕДУСЛОВИЯ:
-- Claude Code запущен в окружении, где доступен `Task(model=haiku)`
+- Claude Code запущен в окружении, где доступен Task(model=haiku)
 - setup.sh прогонится автоматически внутри init-case (либо один раз запусти вручную)
 
 ШАГИ:
 1. Перейди в smoke-директорию:
    cd "$SMOKE_CASE"
 2. Запусти Claude Code в этой папке.
-3. Выполни: /vassal-litigator:init-case
+3. Выполни: /vassal-litigator-cc:init-case
 4. Заполни карточку (если init-case запросит):
    - Клиент: ООО "Ромашка" (истец)
    - Оппонент: ООО "Лютик" (ответчик)
@@ -96,7 +96,7 @@ $SMOKE_CASE
 - .vassal/index.yaml валиден, source: client, у каждой записи заполнены
   id/title/date/file/mirror/origin/extraction_method/confidence/mirror_stale/ocr_quality/ocr_reattempted
 - Комплекты (если план их выделил) имеют bundle_id, role_in_bundle, parent_id, attachment_order
-- для всех новых записей `ocr_quality: ok`, `ocr_reattempted: false`, `ocr_quality_reason: ""`
+- для всех новых записей ocr_quality: ok, ocr_reattempted: false, ocr_quality_reason: ""
 - Материалы от клиента/ содержит хронологическую раскладку:
   * одиночные файлы — без папки (например "2025-06-01 Ромашка Договор поставки.pdf")
   * комплекты — папки вида "ГГГГ-ММ-ДД Отправитель Описание/" с "Приложение NN — ...расш"
@@ -104,19 +104,18 @@ $SMOKE_CASE
 - Скриншот скан.jpg превращён в PDF; .jpg-оригинал остался ТОЛЬКО в .vassal/raw/
 - архив.zip НЕ попал в "Материалы от клиента/" и НЕ индексируется в index.yaml
   (в raw остаётся, в index.yaml есть только его содержимое)
-- Зеркало для `большой-договор.pdf` содержит полный текст OCR-артефакта, без усечения
+- Зеркало для большой-договор.pdf содержит полный текст OCR-артефакта, без усечения
 - Входящие документы/ пустая (все 5 файлов удалены через rm после архивации в .vassal/raw/)
 - .vassal/plans/intake-*.md удалён после архивации
-- .vassal/codex-logs/ГГГГ-ММ-ДД-ЧЧмм-intake-plan.md — архивная копия плана
 - .vassal/work/intake-*/ удалена целиком
 - .vassal/history.md содержит две строки: "intake plan: ..." и "intake apply: ..."
+- legacy-директория .vassal/codex-logs/ может существовать только в старых делах v0.5.x, но новый intake её не создаёт и не использует
 
 ПРОВЕРКА:
 - ls -la "\$SMOKE_CASE/Входящие документы/"                      # должна быть пустой
 - find "\$SMOKE_CASE/.vassal/raw" -type f | wc -l                # >= 7 (5 исходников + 2 из архива)
 - find "\$SMOKE_CASE/.vassal/mirrors" -name 'doc-*.md' | wc -l   # == число записей в index.yaml
 - find "\$SMOKE_CASE/Материалы от клиента" -type f               # хронологическая раскладка
-- find "\$SMOKE_CASE/.vassal/codex-logs" -name '*-intake-plan.md' -type f
 - ls "\$SMOKE_CASE/.vassal/plans/" 2>/dev/null; ls "\$SMOKE_CASE/.vassal/work/" 2>/dev/null
 - export SMOKE_CASE="$SMOKE_CASE"; export PLUGIN_ROOT="$PLUGIN_ROOT"
 - python3 -c "import yaml, pathlib; p=pathlib.Path('\$SMOKE_CASE/.vassal/index.yaml'); d=yaml.safe_load(p.read_text(encoding='utf-8')); docs=d.get('documents', []); print('docs=', len(docs), 'next_id=', d.get('next_id')); print([d2.get('source') for d2 in docs])"

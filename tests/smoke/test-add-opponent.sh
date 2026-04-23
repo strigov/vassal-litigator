@@ -24,7 +24,7 @@ if [[ -z "$PLUGIN_ROOT" ]]; then
 fi
 
 case "$PWD" in
-    /tmp|/tmp/*) ;;
+    /tmp|/tmp/*|/private/tmp|/private/tmp/*) ;;
     *)
         echo "WARNING: smoke-скрипт можно запускать только из /tmp/. Текущий CWD: $PWD"
         exit 1
@@ -64,10 +64,10 @@ $SMOKE_CASE
 1. Перейди в smoke-директорию:
    cd "$SMOKE_CASE"
 2. Запусти Claude Code в этой папке.
-3. Выполни /vassal-litigator:init-case и дождись завершения базового intake.
+3. Выполни /vassal-litigator-cc:init-case и дождись завершения базового intake.
 4. Добавь новую поставку оппонента:
    cp "$PAYLOAD_DIR/большой-отзыв-ответчика.pdf" "$SMOKE_CASE/Входящие документы/большой-отзыв-ответчика.pdf"
-5. Выполни: /vassal-litigator:add-opponent
+5. Выполни: /vassal-litigator-cc:add-opponent
 6. Проверь preview:
    - найден один новый файл
    - выбран оппонент из карточки дела
@@ -76,12 +76,12 @@ $SMOKE_CASE
 8. Если после apply будет предложен экспресс-анализ Opus, его можно подтвердить отдельно; файловая проверка на этом не зависит.
 
 ОЖИДАЕМЫЙ РЕЗУЛЬТАТ:
-- создан raw-батч `.vassal/raw/opponent-ГГГГ-ММ-ДД/` с копией `большой-отзыв-ответчика.pdf`
-- в `.vassal/index.yaml` появилась новая запись с `source: opponent`, `ocr_quality: ok`, `ocr_quality_reason: ""`, `ocr_reattempted: false`
-- для новой записи создано `.vassal/mirrors/doc-NNN.md` с полным текстом
+- создан raw-батч .vassal/raw/opponent-ГГГГ-ММ-ДД/ с копией большой-отзыв-ответчика.pdf
+- в .vassal/index.yaml появилась новая запись с source: opponent, ocr_quality: ok, ocr_quality_reason: "", ocr_reattempted: false
+- для новой записи создано .vassal/mirrors/doc-NNN.md с полным текстом
 - создана процессуальная папка с головным документом оппонента
-- `.vassal/codex-logs/` содержит архив плана add-opponent
-- `.vassal/plans/add-opponent-*.md` и `.vassal/work/add-opponent-*/` удалены
+- .vassal/plans/add-opponent-*.md и .vassal/work/add-opponent-*/ удалены
+- legacy-директория .vassal/codex-logs/ может существовать только в старых делах v0.5.x, но новый add-opponent её не создаёт и не использует
 
 ПРОВЕРКА:
 - export SMOKE_CASE="$SMOKE_CASE"; export PLUGIN_ROOT="$PLUGIN_ROOT"
@@ -124,7 +124,6 @@ print("add-opponent OCR assertions: OK")
 PYEOF
 - assert_mirror_full "большой-отзыв-ответчика.pdf"
 - find "\$SMOKE_CASE/.vassal/raw" -path '*opponent-*' -type f
-- find "\$SMOKE_CASE/.vassal/codex-logs" -name '*add-opponent-plan.md' -type f
 - ls "\$SMOKE_CASE/.vassal/plans/" 2>/dev/null; ls "\$SMOKE_CASE/.vassal/work/" 2>/dev/null
 
 ОЧИСТКА:

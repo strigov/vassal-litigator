@@ -6,7 +6,7 @@ description: Построение юридической хронологии д
 
 Когда пользователь запускает эту команду:
 
-1. Убедись что `.vassal/case.yaml` существует. Если нет — предложи `/vassal-litigator:init-case` и остановись.
+1. Убедись что `.vassal/case.yaml` существует. Если нет — предложи `/vassal-litigator-cc:init-case` и остановись.
 2. Прочитай `skills/timeline/SKILL.md` и следуй ему по схеме `preview → confirm → apply → verify`.
 3. В preview-фазе собери read-only сводку по источникам, текущему `case.yaml.timeline` и будущему файлу хронологии.
 4. Покажи preview Сюзерену и дождись явного подтверждения и выбора политики `extend` или `rebuild`.

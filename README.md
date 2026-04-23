@@ -1,8 +1,8 @@
-> **ВАЖНО: Конфиденциальность (v0.5.0).** Плагин отправляет материалы дела (тексты документов, зеркала, метаданные) в OpenAI через Codex CLI для выполнения файлового пайплайна, построения таймлайна, визуализаций и контрольного ревью аналитики. Устанавливая плагин, вы подтверждаете согласие на такую передачу. Если это недопустимо для вашей юрисдикции или клиентского договора — используйте [v0.4.0](../../releases/tag/v0.4.0) («всё локально», без Codex).
+> **ВАЖНО: Конфиденциальность.** Плагин отправляет материалы дела (тексты документов, зеркала, метаданные) в Anthropic через Claude для файлового пайплайна, аналитики и подготовки документов. Устанавливая плагин, вы подтверждаете согласие на такую передачу. Если это недопустимо для вашей юрисдикции или клиентского договора — не устанавливайте плагин.
 
-# vassal-litigator
+# vassal-litigator-cc
 
-Плагин для [Claude Cowork](https://claude.ai), помогающий юристу вести судебные дела — от первичного приёма материалов клиента до кассационной жалобы.
+Вассал — плагин для **Claude Code**, помогающий юристу вести судебные дела от первичного приёма материалов клиента до кассационной жалобы. Форк [vassal-litigator](https://github.com/strigov/vassal-litigator) v0.5.4, адаптированный под Claude-only оркестрацию.
 
 ## Возможности
 
@@ -10,25 +10,24 @@
 
 **Правовой анализ** — квалификация спора, проверка сроков исковой давности, определение подсудности, оценка полноты доказательственной базы, формирование правовой позиции с оценкой рисков.
 
-**Подготовка к заседаниям** — стресс-тест позиции (red team / blue team), генерация процессуальных документов (отзывы, ходатайства, пояснения) через связанный плагин `arbitrum-docx`.
+**Подготовка к заседаниям** — stress-test позиции (red team / blue team), генерация процессуальных документов и заметок к заседанию.
 
 **Анализ заседаний** — разбор транскрипций: речевые паттерны судьи, уклончивые ответы оппонента, рекомендации по тактике.
 
-**Обжалование** — подготовка апелляционных и кассационных жалоб с систематическим поиском оснований по АПК/ГПК РФ, проект судебного решения с учётом стиля конкретного судьи.
+**Обжалование** — подготовка апелляционных и кассационных жалоб, а также проекта судебного решения с учётом стиля конкретного судьи.
 
-## Скиллы (15)
+## Скиллы (14)
 
 | Фаза | Скилл | Описание |
 |------|-------|----------|
 | Фундамент | `intake` | Приём и обработка материалов клиента |
 | | `catalog` | Генерация xlsx-таблицы документов |
 | | `update-index` | Верификация и синхронизация реестра |
-| | `codex-invocation` | Единый контракт вызова Codex CLI (читается другими скиллами) |
-| | `timeline` | Построение юридической хронологии дела (Codex high) |
-| | `visualize` | Sidecar-визуализации через $imagegen (вызывается из других скиллов) |
+| | `reocr` | Повторный OCR плохо распознанных документов через Haiku vision |
+| | `timeline` | Построение юридической хронологии дела |
 | Анализ | `legal-review` | Комплексный правовой анализ |
 | | `build-position` | Формирование правовой позиции |
-| Ведение дела | `add-evidence` | Приём доп. доказательств от клиента |
+| Ведение дела | `add-evidence` | Приём дополнительных доказательств от клиента |
 | | `add-opponent` | Приём и анализ документов оппонента |
 | | `prepare-hearing` | Подготовка к заседанию |
 | | `analyze-hearing` | Анализ транскрипции заседания |
@@ -36,131 +35,156 @@
 | | `appeal` | Апелляционная жалоба |
 | | `cassation` | Кассационная жалоба |
 
-## Что нового в v0.5.0 — отличия от v0.4.0
+## Требования
 
-> **v0.4.0** (без Codex, «всё локально») по-прежнему доступна как отдельный релиз: [скачать v0.4.0](../../releases/tag/v0.4.0).
-
-### Breaking change: конфиденциальность
-
-В v0.4.0 все операции выполнялись локально — без передачи данных третьим сторонам. В v0.5.0 материалы дела передаются в OpenAI через Codex CLI. Если это неприемлемо — используйте v0.4.0.
-
-### Сравнение версий
-
-| Возможность | v0.4.0 | v0.5.0 |
-|---|---|---|
-| Файловый пайплайн (OCR, зеркала, индексация) | Haiku-субагент внутри Claude | Codex medium `--write` |
-| Хронология дела (`timeline`) | — | Codex high `--write` |
-| Sidecar-визуализации PNG | — | Codex medium → gpt-image-1.5 |
-| Контрольное ревью аналитики | — | Codex xhigh, аудируемый BLOCKING-формат |
-| Конфиденциальность | Всё локально | Данные отправляются в OpenAI |
-| Работа без Codex | Полная | Деградированный режим (fallback на Claude) |
-
-### Дополнительные требования в v0.5.0
-
-- Плагин `openai-codex` ≥ 1.0.3 установлен в Claude Cowork
-- Выполненный `codex login`
-- Для визуализаций: `codex features enable image_generation`
-
-Без `openai-codex` плагин работает в деградированном режиме: Claude выполняет все операции самостоятельно (как v0.4.0), но без таймлайна, визуализаций и контрольного ревью.
-
----
+- [Claude Code](https://claude.com/claude-code) (CLI, desktop или IDE-расширение)
+- User-level skill `arbitrum-docx` для оформления `.docx`
+- Локальные зависимости, которые ставит `scripts/setup.sh`: `tesseract-ocr`, `pillow`, Python-пакеты `python-docx`, `openpyxl`, `pymupdf`
 
 ## Установка
 
-### 1. Установите как плагин Claude Cowork
+### 1. Добавьте маркетплейс и установите плагин
 
-Скачайте zip-архив из [Releases](../../releases) и загрузите в Claude Cowork, или клонируйте репозиторий:
+В Claude Code выполните по очереди:
 
-```bash
-git clone https://github.com/strigov/vassal-litigator.git
+```text
+/plugin marketplace add strigov/strigov-cc-plugins
 ```
-И попросите Claude Cowork или Claude Code собрать вам плагин. У вас должен быть 
 
-После чего откройте Cowork → Customize (в боковой панели) → Plugins (в боковой панели) → Personal (вкладка справа) → + (кнопка ниже) → Upload Plugin. 
+Claude Code скачает `.claude-plugin/marketplace.json` с GitHub и зарегистрирует маркетплейс под именем `strigov-cc-plugins`.
 
-В появившееся окно перетащите архив vassal-litigator.zip. Принимается только zip файл.
+```text
+/plugin install vassal-litigator-cc@strigov-cc-plugins
+```
+
+Проверить статус:
+
+```text
+/plugin
+```
+
+Во вкладке *Installed* должен появиться `vassal-litigator-cc`. После этого команды `/vassal-litigator-cc:init-case`, `/vassal-litigator-cc:intake` и остальные становятся доступны.
+
+Обновление плагина:
+
+```text
+/plugin update vassal-litigator-cc@strigov-cc-plugins
+```
 
 ### 2. Установите зависимости
 
+Из папки установленного плагина:
+
 ```bash
-cd vassal-litigator
 chmod +x scripts/setup.sh
 ./scripts/setup.sh
 ```
 
-Скрипт установит: `tesseract-ocr` (для OCR), а также Python-пакеты `python-docx`, `openpyxl`, `pymupdf`.
-
-### 3. Установите плагин openai-codex и войдите в аккаунт
-
-Плагин использует Codex CLI для файловых операций, таймлайна, визуализаций и контрольного ревью.
-
-Установка: следуй инструкции плагина openai-codex.
-
-```bash
-codex login
-```
-
-Без openai-codex плагин работает в ограниченном режиме (Claude-main выполняет все операции самостоятельно).
-
-### 4. Связанный плагин (опционально)
-
-Для генерации процессуальных документов в `.docx` рекомендуется создать скилл или плагин для создания документов по используемому вами шаблону.
+Скрипт установит OCR-зависимости, Python-пакеты и утилиты для работы с архивами. При необходимости `setup.sh` можно вызывать повторно.
 
 ## Быстрый старт
 
-1. Создайте новое дело: `/vassal-litigator:init-case`
-2. Положите документы клиента в папку «Входящие документы/»
-3. Обработайте: `/vassal-litigator:intake`
-4. Далее по ситуации: `catalog` → `legal-review` → `build-position` → `prepare-hearing` и т.д.
+1. Создайте папку будущего дела и положите туда сырые материалы клиента: pdf, docx, сканы, zip.
+2. Откройте эту папку в Claude Code и выполните:
+   ```text
+   /vassal-litigator-cc:init-case
+   ```
+3. Плагин создаст скелет, перенесёт файлы во `Входящие документы/`, выполнит `intake` и спросит только недостающие поля карточки дела.
+4. Дальше по ситуации:
+   - `/vassal-litigator-cc:catalog` — xlsx-таблица документов
+   - `/vassal-litigator-cc:legal-review` — правовой анализ
+   - `/vassal-litigator-cc:build-position` — правовая позиция с оценкой рисков
+   - `/vassal-litigator-cc:prepare-hearing` — подготовка к заседанию
+   - `/vassal-litigator-cc:timeline` — хронология дела
+   - `/vassal-litigator-cc:add-evidence` / `/vassal-litigator-cc:add-opponent` — добавление новых материалов
+   - `/vassal-litigator-cc:analyze-hearing` — разбор транскрипции
+   - `/vassal-litigator-cc:appeal` / `/vassal-litigator-cc:cassation` — жалобы
 
 ## Маршрутизация моделей
 
-| Задача | Модель |
-|--------|--------|
-| Файловые операции (OCR, зеркала, индексация) | Codex medium (`--write`) |
-| Таймлайн | Codex high (`--write`) |
-| Визуализации sidecar (PNG) | Codex medium → gpt-image-1.5 |
-| Контрольное ревью аналитики | Codex xhigh (read-only) |
-| Оркестрация, preview, git | Sonnet |
-| Правовой анализ, позиции, документы | Opus |
+Claude работает в четырёх ролях:
 
-## Структура проекта
+- `Sonnet-main` — оркестрация, preview/apply, запись файлов дела.
+- `Haiku-subagent` — файловая рутина и vision re-OCR.
+- `Opus-subagent` — аналитика и юридическое письмо.
+- `Sonnet-subagent` — оформление `.docx` через `arbitrum-docx`.
 
-```
-vassal-litigator/
+Подробный контракт — в [shared/subagent-dispatch.md](shared/subagent-dispatch.md).
+
+| Скилл | Main | Subagent-цепочка |
+|------|------|------------------|
+| `intake` | Sonnet-main | Haiku-subagent |
+| `add-evidence` | Sonnet-main | Haiku-subagent |
+| `add-opponent` | Sonnet-main | Haiku-subagent |
+| `update-index` | Sonnet-main | без обязательного субагента |
+| `reocr` | Sonnet-main | Haiku-subagent |
+| `catalog` | Sonnet-main | без обязательного субагента |
+| `timeline` | Sonnet-main | Opus-subagent |
+| `analyze-hearing` | Sonnet-main | Opus-subagent |
+| `legal-review` | Sonnet-main | Opus-subagent → Sonnet-subagent |
+| `build-position` | Sonnet-main | Opus-subagent → Sonnet-subagent |
+| `prepare-hearing` | Sonnet-main | Opus-subagent → Sonnet-subagent |
+| `draft-judgment` | Sonnet-main | Opus-subagent → Sonnet-subagent |
+| `appeal` | Sonnet-main | Opus-subagent → Sonnet-subagent |
+| `cassation` | Sonnet-main | Opus-subagent → Sonnet-subagent |
+
+## Что нового в v0.6.0
+
+### Breaking
+
+- Удалена зависимость на openai-плагин CLI-компаньона и внешний companion runtime.
+- Удалён sidecar-визуализатор; его заменили inline Mermaid-блоки в `legal-review`, `build-position` и `timeline`.
+- Удалён отдельный skill-диспетчер внешнего companion runtime.
+- Контрольное отдельное high-effort ревью аналитики больше не выполняется; если нужна глубина, пользователь задаёт thinking-override (`think hard`, `think harder`, `ultrathink`).
+
+### Added
+
+- Новый скилл `reocr` для повторного OCR через Haiku vision.
+- Команда `/vassal-litigator-cc:reocr [--force] [doc-NNN ...]`.
+- Поля `ocr_quality`, `ocr_quality_reason`, `ocr_reattempted` в `index.yaml`.
+- `shared/subagent-dispatch.md` как единый справочник Task-контрактов.
+- `scripts/render_pages.py` для конвертации PDF и изображений в PNG перед vision-OCR.
+
+### Changed
+
+- Все файловые скиллы (`intake`, `add-evidence`, `add-opponent`, `update-index`) работают через Sonnet-main; файловая рутина уходит в Haiku-subagent только там, где это оправдано.
+- Все аналитические скиллы с `.docx` (`legal-review`, `build-position`, `prepare-hearing`, `draft-judgment`, `appeal`, `cassation`) используют цепочку Opus-subagent → Sonnet-subagent → `arbitrum-docx`.
+- `timeline` и `analyze-hearing` перешли на markdown-only вывод через Opus-subagent.
+- `catalog` теперь вызывает `scripts/generate_table.py` напрямую, без промежуточного исполнителя.
+
+### Migration
+
+- Дела `v0.5.x` работают без миграционного скрипта.
+- Отсутствующее поле `ocr_quality` трактуется как `ok`.
+- Чтобы проставить новые OCR-поля в старом деле, запустите `/vassal-litigator-cc:update-index`.
+
+## Структура плагина
+
+```text
+vassal-litigator-cc/
 ├── .claude-plugin/
-│   └── plugin.json          # Манифест плагина
-├── commands/                 # Slash-команды (14)
-├── skills/                   # Скиллы (15)
-│   ├── intake/
-│   ├── catalog/
-│   ├── codex-invocation/
-│   ├── timeline/
-│   ├── visualize/
-│   ├── legal-review/
-│   │   └── references/       # Справочники по срокам, подсудности, досудебному порядку
-│   ├── build-position/
-│   ├── add-evidence/
-│   ├── add-opponent/
-│   ├── prepare-hearing/
-│   ├── analyze-hearing/
-│   ├── draft-judgment/
-│   ├── appeal/
-│   ├── cassation/
-│   └── update-index/
-├── shared/                   # Общие схемы и конвенции
-│   ├── conventions.md
+│   └── plugin.json
+├── commands/
+├── skills/
+├── shared/
 │   ├── case-schema.yaml
 │   ├── index-schema.yaml
-│   └── mirror-template.md
-├── scripts/                  # Утилиты
-│   ├── setup.sh
-│   ├── extract_text.py
-│   └── generate_table.py
-├── prompts/                  # Шаблоны промптов Codex CLI
-├── ARCHITECTURE.md           # Подробная архитектура
-└── CHANGELOG.md
+│   ├── mirror-template.md
+│   ├── conventions.md
+│   └── subagent-dispatch.md
+├── scripts/
+├── tests/
+├── ARCHITECTURE.md
+├── CHANGELOG.md
+└── README.md
 ```
+
+## Отличия от vassal-litigator (Cowork edition)
+
+- Оркестрация полностью переведена на Claude-only subagent dispatch, без внешнего companion runtime.
+- Sidecar-визуализации убраны; вместо них аналитические скиллы пишут inline Mermaid.
+- Для плохо распознанных сканов добавлен `reocr` с Haiku vision.
+- Бизнес-логика дела и файловые контракты сохранены, но модельная маршрутизация теперь описана в `shared/subagent-dispatch.md`.
 
 ## Лицензия
 
@@ -168,4 +192,4 @@ GPL-3.0. См. [LICENSE](LICENSE).
 
 ## Автор
 
-Ian ([@strigov](https://github.com/strigov))
+Ian Strigov ([@strigov](https://github.com/strigov))

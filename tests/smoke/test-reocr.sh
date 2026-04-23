@@ -69,7 +69,7 @@ $SMOKE_CASE
 1. Перейди в smoke-директорию:
    cd "$SMOKE_CASE"
 2. Запусти Claude Code в этой папке.
-3. Выполни /vassal-litigator:init-case и дождись завершения базового intake.
+3. Выполни /vassal-litigator-cc:init-case и дождись завершения базового intake.
 4. Найди doc-ID плохого скана и проверь, что после intake он имеет `ocr_quality: low`:
    export SMOKE_CASE="$SMOKE_CASE"; export PLUGIN_ROOT="$PLUGIN_ROOT"
    source "\$SMOKE_CASE/.smoke-fulltext.sh"

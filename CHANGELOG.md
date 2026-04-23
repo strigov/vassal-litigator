@@ -1,68 +1,27 @@
-## [vassal-litigator] v0.5.0 -- 2026-04-21
+## [0.6.0] — 2026-04-23
 
-### Breaking changes
-- Отправка материалов дела в OpenAI через Codex CLI. Отменён принцип «всё локально» из v0.4.0. См. README «Конфиденциальность».
-- Haiku-субагенты удалены из файлового пайплайна — заменены на Codex medium с `--write`.
-- Требуется установка плагина openai-codex ≥ 1.0.3 и `codex login`.
+### Breaking
+
+- Удалена зависимость на openai-codex / Codex CLI / `$CODEX_COMPANION`.
+- Удалён скилл `visualize` — заменён inline Mermaid-блоками в `legal-review` / `build-position` / `timeline`.
+- Удалён скилл `codex-invocation`.
+- Контрольное xhigh-ревью аналитики больше не проводится (компенсация: `ultrathink` ключевое слово от пользователя).
 
 ### Added
-- Скилл `codex-invocation` — единый контракт вызова Codex CLI; контракт путей `[PLUGIN_ROOT]`/`[CASE_ROOT]`.
-- Директория `prompts/` с преамбулой `_preamble.md` и шаблонами для четырёх ролей Codex.
-- Скилл `timeline` + команда `/vassal-litigator:timeline` — построение юридической хронологии на Codex high. Выход: `Хронология дела.md` (Mermaid + таблица) + `case.yaml.timeline`.
-- Скилл `visualize` — визуализация через `$imagegen` (gpt-image-1.5) как sidecar-превью в `.vassal/visuals/`. Картинки AI-generated, не доказательство, не индексируются, не встраиваются в процессуальные и аналитические документы по умолчанию.
-- Контрольное ревью Codex xhigh в 6 аналитических скиллах в аудируемом формате (Категория, Замечание, Фактическое основание с цитатой, Правовое основание, Источники doc-NNN, Уверенность, Недостающие данные, Что проверить). Артефакты ревью в `.vassal/reviews/`.
-- `scripts/generate_table.py` — helper для генерации `.vassal/Таблица документов.xlsx` (fallback: CSV).
-- Расширена схема событий timeline в `shared/case-schema.yaml`: поля `docs`, `legal_consequence`, `visual_group`.
+
+- Новый скилл `reocr` — перепрогон OCR через Haiku vision.
+- Команда `/vassal-litigator-cc:reocr [--force] [doc-NNN ...]`.
+- Поле `ocr_quality` / `ocr_quality_reason` / `ocr_reattempted` в записях `index.yaml`.
+- `shared/subagent-dispatch.md` — единый справочник Task-контрактов.
+- `scripts/render_pages.py` — PDF/image → PNG для vision-OCR.
 
 ### Changed
-- Скиллы `intake`, `catalog`, `update-index`, `add-evidence`, `add-opponent` — файловый пайплайн теперь на Codex medium. Preview строит Claude-main (read-only, без OCR и файловых операций); apply — Codex с `--write` после подтверждения Сюзерена.
-- Скиллы `legal-review`, `build-position`, `prepare-hearing`, `draft-judgment`, `appeal`, `cassation` — добавлена фаза контрольного ревью Codex xhigh между Preview и Apply.
-- ARCHITECTURE.md — §7.2 маршрутизация моделей переписана; §14 п.6 обновлён (конфиденциальность); добавлен §15 «Интеграция с Codex CLI».
 
-### Removed
-- Haiku-модель из всех скиллов.
-- Принцип «обработка локально» из ARCHITECTURE §14 п.6.
+- Все файловые скиллы (`intake` / `add-evidence` / `add-opponent` / `update-index`) — Sonnet-main + Haiku-subagent.
+- Все аналитические скиллы с `.docx` (`legal-review` / `build-position` / `prepare-hearing` / `draft-judgment` / `appeal` / `cassation`) — Opus-subagent + Sonnet-subagent → `arbitrum-docx`.
+- `timeline` / `analyze-hearing` — Opus-subagent.
+- `catalog` — Sonnet-main + прямой вызов `scripts/generate_table.py`.
 
-## [vassal-litigator] v0.4.0 -- 2026-03-27
+### Migration
 
-### Added
-- Фаза 4 -- Обжалование и прогнозирование:
-  - `draft-judgment` -- скилл + команда проекта судебного акта (цифровой профиль судьи по Мошкину, анализ стиля по 3-5 решениям, Opus-генерация)
-  - `appeal` -- скилл + команда апелляционной жалобы (систематический поиск оснований по ст. 270 АПК РФ / ст. 330 ГПК РФ, стресс-тест, Opus-анализ)
-  - `cassation` -- скилл + команда кассационной жалобы (проверка только применения норм права, сравнительный анализ двух инстанций, обязательные ссылки на ВС РФ)
-
-### Changed
-- plugin.json: версия 0.3.0 -> 0.4.0
-
-## [vassal-litigator] v0.3.0 -- 2026-03-26
-
-### Added
-- Фаза 3 -- Ведение дела:
-  - `add-evidence` -- скилл + команда приема дополнительных доказательств от клиента
-  - `add-opponent` -- скилл + команда приема документов оппонента (с экспресс-анализом аргументов)
-  - `prepare-hearing` -- скилл + команда подготовки к заседанию (red team/blue team, генерация процессуального документа через arbitrum-docx)
-  - `analyze-hearing` -- скилл + команда анализа транскрипции заседания (внутренний отчет + отчет для клиента)
-
-## [vassal-litigator] v0.2.0 -- 2026-03-26
-
-### Added
-- Фаза 2 -- Анализ:
-  - `legal-review` -- скилл + команда предварительного правового анализа документов (Opus)
-  - `build-position` -- скилл + команда формирования правовой позиции (Opus, 7 блоков, аудируемый формат)
-- Конвенции: дата-префикс в именах файлов, источники по названиям документов (не doc-ID)
-
-### Changed
-- shared/conventions.md -- добавлены правила дата-префикса и источников
-
-## [vassal-litigator] v0.1.0 -- 2026-03-26
-
-### Added
-- Архитектура v0.2.0-draft (ARCHITECTURE.md)
-- Фаза 1 — Фундамент:
-  - `init-case` — команда инициализации дела (case.yaml, index.yaml, структура папок)
-  - `intake` — скилл + команда приёма материалов клиента (OCR, переименование, md-зеркала, preview→apply)
-  - `catalog` — скилл + команда каталогизации документов (xlsx-таблица, обогащение summary)
-  - `update-index` — скилл + команда верификации и обновления индекса
-- shared/ — конвенции, схемы (case.yaml, index.yaml), шаблон md-зеркала
-- scripts/ — setup.sh (установка зависимостей), extract_text.py (извлечение текста из PDF/DOCX/изображений)
-- plugin.json, .mcp.json
+- Существующие дела `v0.5.x` работают без миграционного скрипта. Поле `ocr_quality` отсутствует → трактуется как `ok`. Для простановки — прогнать `/vassal-litigator-cc:update-index`.

@@ -67,7 +67,7 @@ __SMOKE_CASE__
 1. Перейди в smoke-директорию:
    cd "__SMOKE_CASE__"
 2. Запусти Claude Code в этой папке.
-3. Выполни /vassal-litigator:init-case и дождись завершения базового intake.
+3. Выполни /vassal-litigator-cc:init-case и дождись завершения базового intake.
 4. Подготовь новый файл для режима добавления:
    cp "__PAYLOAD_DIR__/большой-договор-update-index.pdf" "__SMOKE_CASE__/Материалы от клиента/2026-04-22 Большой документ для update-index.pdf"
 5. Подготовь устаревшее зеркало для режима пересоздания:
@@ -89,7 +89,7 @@ PY
    export STALE_FILE=\$(source_of_id "\$STALE_ID")
    cp "__PAYLOAD_DIR__/большой-договор-update-index.pdf" "__SMOKE_CASE__/\$STALE_FILE"
    touch -m "__SMOKE_CASE__/\$STALE_FILE"
-6. Выполни: /vassal-litigator:update-index
+6. Выполни: /vassal-litigator-cc:update-index
 7. Проверь preview:
    - новый файл `2026-04-22 Большой документ для update-index.pdf` попал в режим добавления
    - `\$STALE_ID` попал в список устаревших зеркал
@@ -100,7 +100,7 @@ PY
 - для `\$STALE_ID` зеркало пересоздано и `mirror_stale: false`
 - для новой записи и `\$STALE_ID` выставлены `ocr_quality: ok`, `ocr_quality_reason: ""`, `ocr_reattempted: false`
 - оба зеркала содержат полный текст без усечения
-- `.vassal/codex-logs/` содержит лог update-index
+- legacy-директория `.vassal/codex-logs/` может существовать только в старых делах v0.5.x, но новый update-index её не создаёт и не использует
 
 ПРОВЕРКА:
 - export SMOKE_CASE="__SMOKE_CASE__"; export PLUGIN_ROOT="__PLUGIN_ROOT__"
@@ -146,7 +146,6 @@ print("update-index OCR assertions: OK")
 PYEOF
 - assert_mirror_full "2026-04-22 Большой документ для update-index.pdf"
 - assert_mirror_full --id "\$STALE_ID"
-- find "\$SMOKE_CASE/.vassal/codex-logs" -name '*update-index*.md' -type f
 
 ОЧИСТКА:
 rm -rf "__SMOKE_CASE__"
