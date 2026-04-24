@@ -39,45 +39,24 @@
 
 - [Claude Cowork](https://claude.ai/code) — браузерная версия Claude Code
 - User-level skill `arbitrum-docx` для оформления `.docx`
-- Локальные зависимости, которые ставит `scripts/setup.sh`: `tesseract-ocr`, `pillow`, Python-пакеты `python-docx`, `openpyxl`, `pymupdf`
 
 ## Установка
 
-### 1. Зарегистрируйте маркетплейс и установите плагин
+### 1. Скачайте архив плагина
 
-Откройте [claude.ai/code](https://claude.ai/code) и выполните в чате по очереди:
+Откройте [Releases](../../releases) и скачайте архив последней версии `vassal-litigator`.
 
-```text
-/plugin marketplace add strigov/strigov-cc-plugins
-```
+Нужен именно архив релиза, а не отдельные файлы из репозитория: Cowork устанавливает плагин как цельный пакет с `.claude-plugin/plugin.json`, командами, скиллами, shared-файлами и скриптами.
 
-```text
-/plugin install vassal-litigator@strigov-cc-plugins
-```
+### 2. Добавьте плагин в Claude Cowork
 
-Проверить статус:
+Откройте [claude.ai/code](https://claude.ai/code), перейдите в интерфейс управления плагинами и добавьте скачанный архив.
 
-```text
-/plugin
-```
+После установки в списке плагинов должен появиться `vassal-litigator`. Команды `/vassal-litigator:init-case`, `/vassal-litigator:intake` и остальные станут доступны в Cowork.
 
-Во вкладке *Installed* должен появиться `vassal-litigator`. После этого команды `/vassal-litigator:init-case`, `/vassal-litigator:intake` и остальные становятся доступны.
+### Обновление
 
-Обновление плагина:
-
-```text
-/plugin update vassal-litigator@strigov-cc-plugins
-```
-
-### 2. Установите локальные зависимости
-
-В терминале из папки установленного плагина:
-
-```bash
-chmod +x scripts/setup.sh && ./scripts/setup.sh
-```
-
-Скрипт установит Tesseract, Python-пакеты и утилиты для работы с архивами. Можно запускать повторно при необходимости.
+Скачайте новый архив из [Releases](../../releases) и замените установленный плагин через тот же интерфейс Cowork.
 
 ## Быстрый старт
 
