@@ -8,10 +8,10 @@ phases:
     status: done
   - id: Ф2
     scope: "scripts/validate_opus_output.py — единый валидатор контрактов 3.1a/3.1b/3.1c + SKILL.md интеграция"
-    status: in-progress
+    status: done
   - id: Ф3
     scope: "scripts/scan_case_state.py — сканер ФС vs index.yaml для update-index Ф1"
-    status: pending
+    status: in-progress
   - id: Ф4
     scope: "scripts/prepare_intake_workdir.py — распаковка архивов + preview-OCR для intake/add-evidence/add-opponent Ф1"
     status: pending

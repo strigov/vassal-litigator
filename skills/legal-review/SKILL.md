@@ -72,17 +72,12 @@ description: >
    - `subagent_type: "general-purpose"`
    - `model: "opus"`
    - `description`: 3-5 слов
-4. Проверь OUTPUT до записи на диск:
-   - markdown не пустой;
-   - есть ровно одна строка `READY_FOR_DOCX: analytical`, и она последняя;
-   - верхнеуровневые заголовки `## ` ограничены только списком:
-     - `## Квалификация`
-     - `## Схема сторон`
-     - `## Анализ`
-     - `## Выводы`
-   - присутствует `## Схема сторон`;
-   - в секции `## Схема сторон` есть блок ````mermaid```.
-5. Если хотя бы одна проверка не проходит, перезапусти Opus-subagent один раз с явным напоминанием о контракте 3.1a, допустимых секциях и финальной строке `READY_FOR_DOCX: analytical`. Если второй ответ невалиден — остановись и покажи блокер.
+4. Проверь OUTPUT через валидационный скрипт:
+   - передай полный текст OUTPUT Opus-subagent в
+     `python3 "$PLUGIN_ROOT/scripts/validate_opus_output.py" --skill legal-review --contract 3.1a --stdin`;
+   - скрипт должен вернуть `valid=true`.
+5. Если `valid=false`, ровно один раз перезапусти Opus-subagent с напоминанием о контракте 3.1a, обязательной структуре и маркере `READY_FOR_DOCX: analytical`, затем повтори валидацию тем же скриптом.
+   Если и после retry `valid=false`, покажи `errors` и останови скилл.
 6. Сохрани валидный markdown-оригинал как есть в `{{md_path}}`.
 7. Подготовь вход для Sonnet-subagent по контракту 3.2:
    - `markdown_input` = markdown без последней строки `READY_FOR_DOCX: analytical`

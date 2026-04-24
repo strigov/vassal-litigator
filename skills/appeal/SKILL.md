@@ -64,11 +64,12 @@ description: >
    - `subagent_type: "general-purpose"`
    - `model: "opus"`
    - `description`: 3-5 слов
-4. Проверь OUTPUT:
-   - markdown не пустой;
-   - есть ровно одна строка `READY_FOR_DOCX: processual`, и она последняя;
-   - верхнеуровневые `## ` секции ограничены списком Ф5d для `appeal`.
-5. Если проверка не проходит, перезапусти Opus-subagent один раз с напоминанием о контракте 3.1a, допустимых секциях и `READY_FOR_DOCX: processual`. Если второй ответ невалиден — остановись и покажи блокер.
+4. Проверь OUTPUT через валидационный скрипт:
+   - передай полный текст OUTPUT Opus-subagent в
+     `python3 "$PLUGIN_ROOT/scripts/validate_opus_output.py" --skill appeal --contract 3.1a --stdin`;
+   - скрипт должен вернуть `valid=true`.
+5. Если `valid=false`, ровно один раз перезапусти Opus-subagent с напоминанием о контракте 3.1a, разрешённых секциях и обязательном `READY_FOR_DOCX: processual`, затем повтори валидацию тем же скриптом.
+   Если и после retry `valid=false`, покажи `errors` и останови скилл.
 6. Подготовь вызов Sonnet-subagent по контракту 3.2:
    - `markdown_input` = markdown без последней строки `READY_FOR_DOCX: processual`
    - `case_meta` = поля из `.vassal/case.yaml`
