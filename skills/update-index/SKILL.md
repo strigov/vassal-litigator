@@ -111,16 +111,9 @@ description: >
 ## Фаза 4 — Verify (main-Sonnet)
 
 1. Снова прочитай `.vassal/index.yaml` и проверь, что все затронутые surviving-записи читаются и указывают на существующие `file`/`mirror`.
-2. Для всех затронутых документов выстави поля `ocr_quality`, `ocr_quality_reason`, `ocr_reattempted` по таблице из [shared/conventions.md](/Users/strigov/Documents/Claude/Projects/Suzerain/plugins/vassal-litigator/shared/conventions.md) §`OCR quality thresholds`.
-3. Нормализуй входные данные перед классификацией и соблюдай приоритет правил:
-   - сначала проверь `extraction_method`: если он не входит в набор `{pdf-text, ocr, docx-parse, text-read}`, трактуй запись как `ocr_quality: ok`, `ocr_quality_reason: ""` и не применяй пороги confidence для этой записи;
-   - если `extraction_method` допустим и `confidence` пришёл строкой вроде `"0.82"`, сначала приведи его к `float`;
-   - только после этого: если для затронутой записи `confidence` отсутствует, равен `null` или не приводится к числу, ставь `ocr_quality: low` и `ocr_quality_reason: "confidence missing or non-numeric"`.
-4. Применяй пороги строго по `shared/conventions.md`:
-   - `pdf-text`, `docx-parse`, `text-read` → `ocr_quality: ok`;
-   - `ocr` с общим объёмом текста < 50 символов → `ocr_quality: empty`;
-   - `ocr` с `confidence >= 0.75` и средним объёмом не меньше 200 символов на страницу → `ocr_quality: ok`, иначе `low`.
-5. Для `update-index`, если отдельный `/vassal-litigator-cc:reocr` не запускался, фиксируй `ocr_reattempted: false`.
+2. Для всех затронутых документов выставь `ocr_quality`/`ocr_quality_reason` через единый скрипт:
+   - вызови `python3 "$PLUGIN_ROOT/scripts/classify_ocr_quality.py" --extraction-method <extraction_method> --confidence <confidence> --total-chars <total_chars> --pages <pages>` и подставь результат в поля. Если `total_chars` или `pages` неизвестны или отсутствуют, передавай значение `""` или `"null"` — скрипт обработает их как `None` и не упадёт.
+3. Для `update-index`, если отдельный `/vassal-litigator-cc:reocr` не запускался, фиксируй `ocr_reattempted: false`.
 6. Для записей с `ocr_quality: ok` всегда ставь `ocr_quality_reason: ""`. Если качество `low` или `empty`, не скрывай это в резюме: перечисли `doc-ID` и причину ручной проверки.
 7. Проверь, что:
    - новые зеркала созданы, а пересозданные зеркала обновлены;

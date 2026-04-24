@@ -91,13 +91,8 @@ Main-Sonnet не вставляет в subagent prompt полные тексты
 ## Фаза 4 — Verify (main-Sonnet)
 
 1. Прочитай `.vassal/index.yaml` и убедись, что новые записи имеют обязательные поля из `shared/index-schema.yaml`.
-2. Для всех новых записей проверь OCR-поля по [shared/conventions.md](/Users/strigov/Documents/Claude/Projects/Suzerain/plugins/vassal-litigator/shared/conventions.md) §`OCR quality thresholds` и используй одинаковые правила классификации:
-   - поля `ocr_quality`, `ocr_quality_reason`, `ocr_reattempted` присутствуют;
-   - если `confidence` пришёл строкой вроде `"0.82"`, сначала приведи его к `float`, потом сравнивай с порогами;
-   - если у **новой** записи `confidence` отсутствует, равен `null` или не приводится к числу, ставь `ocr_quality: low` и `ocr_quality_reason: "confidence missing or non-numeric"`;
-   - если `extraction_method` не входит в известный набор `{tesseract, text, docx, xlsx, haiku-vision}`, трактуй запись как `ocr_quality: ok`: неизвестный метод, скорее всего, означает native text; `ocr_quality_reason: ""`;
-   - для записей с `ocr_quality: ok` всегда ставь `ocr_quality_reason: ""`;
-   - legacy-записи `v0.5.x` без поля `ocr_quality` трактуй по презумпции из `shared/conventions.md`; правило здесь не дублируй.
+2. Для каждого нового документа вычисли `ocr_quality`/`ocr_quality_reason` через:
+   - `python3 "$PLUGIN_ROOT/scripts/classify_ocr_quality.py" --extraction-method <extraction_method> --confidence <confidence> --total-chars <total_chars> --pages <pages>` и подставь результат в поля записи. Если `total_chars` или `pages` неизвестны или отсутствуют, передавай значение `""` или `"null"` — скрипт обработает их как `None` и не упадёт.
 3. Для этого этапа отдельный `reocr` ещё не запускался: если повторной попытки не было, фиксируй `ocr_reattempted: false`.
 4. Если `ocr_quality` получилось `low` или `empty`, не скрывай это в резюме: пометь запись для ручной проверки и покажи причину.
 5. Проверь, что:

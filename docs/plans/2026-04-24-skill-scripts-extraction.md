@@ -5,10 +5,10 @@ status: in-progress
 phases:
   - id: Ф1
     scope: "scripts/classify_ocr_quality.py + tests/unit scaffold — single source of truth for OCR quality table"
-    status: in-progress
+    status: done
   - id: Ф2
     scope: "scripts/validate_opus_output.py — единый валидатор контрактов 3.1a/3.1b/3.1c + SKILL.md интеграция"
-    status: pending
+    status: in-progress
   - id: Ф3
     scope: "scripts/scan_case_state.py — сканер ФС vs index.yaml для update-index Ф1"
     status: pending

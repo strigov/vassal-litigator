@@ -76,12 +76,7 @@ description: >
 2. Проверь, что у новых записей:
    - `source: opponent`;
    - корректны `bundle_id`, `role_in_bundle`, `parent_id` для головы и приложений;
-   - поля `ocr_quality`, `ocr_quality_reason`, `ocr_reattempted` заполнены по правилам из [shared/conventions.md](/Users/strigov/Documents/Claude/Projects/Suzerain/plugins/vassal-litigator/shared/conventions.md), причём:
-     - если `confidence` пришёл строкой вроде `"0.82"`, сначала приведи его к `float`, потом сравнивай с порогами;
-     - если у **новой** записи `confidence` отсутствует, равен `null` или не приводится к числу, ставь `ocr_quality: low` и `ocr_quality_reason: "confidence missing or non-numeric"`;
-     - если `extraction_method` не входит в известный набор `{tesseract, text, docx, xlsx, haiku-vision}`, трактуй запись как `ocr_quality: ok`: неизвестный метод, скорее всего, означает native text; `ocr_quality_reason: ""`;
-     - для записей с `ocr_quality: ok` всегда ставь `ocr_quality_reason: ""`;
-     - legacy-записи `v0.5.x` без поля `ocr_quality` трактуй по презумпции из `shared/conventions.md`; правило здесь не дублируй.
+   - для каждого документа вызови `python3 "$PLUGIN_ROOT/scripts/classify_ocr_quality.py" --extraction-method <extraction_method> --confidence <confidence> --total-chars <total_chars> --pages <pages>` и подставь `ocr_quality`/`ocr_quality_reason` из JSON-ответа скрипта. Если `total_chars` или `pages` неизвестны или отсутствуют, передавай значение `""` или `"null"` — скрипт обработает их как `None` и не упадёт.
 3. Пока повторный OCR не запускался, фиксируй `ocr_reattempted: false`. Если качество `low` или `empty`, обязательно сохрани причину и сообщи об этом Сюзерену.
 4. Убедись, что:
    - процессуальная папка реально создана;
