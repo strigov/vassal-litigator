@@ -1,0 +1,64 @@
+version: 2
+last_updated: "2024-03-01T00:00:00"
+
+documents:
+  - id: "doc-001"
+    file: "Материалы от клиента/2024-01-15 Иск.pdf"
+    mirror: ".vassal/mirrors/doc-001.md"
+    type: "исковое заявление"
+    title: "Иск"
+    date: "2024-01-15"
+    parties:
+      - "Истец"
+    summary: "Исковое заявление."
+    seal: false
+    signature: true
+    completeness: "full"
+    quality: "high"
+    needs_manual_review: false
+    pages: 5
+    source: "client"
+    added: "2024-01-15"
+    processed_by: "haiku"
+    origin:
+      name: "2024-01-15 Иск.pdf"
+      received: "2024-01-15"
+      batch: "intake-2024-01-15"
+    mirror_stale: false
+    ocr_quality: "ok"
+    ocr_quality_reason: ""
+    ocr_reattempted: false
+    last_verified: "2024-01-01T00:00:00"
+
+  - id: "doc-002"
+    file: "Материалы от клиента/2024-03-01 Отзыв.pdf"
+    mirror: ".vassal/mirrors/doc-002.md"
+    type: "отзыв"
+    title: "Отзыв на иск"
+    date: "2024-03-01"
+    parties:
+      - "Ответчик"
+    summary: "Отзыв на исковое заявление."
+    seal: false
+    signature: true
+    completeness: "full"
+    quality: "high"
+    needs_manual_review: false
+    pages: 3
+    source: "opponent"
+    added: "2024-03-01"
+    processed_by: "haiku"
+    origin:
+      name: "2024-03-01 Отзыв.pdf"
+      received: "2024-03-01"
+      batch: "intake-2024-03-01"
+    mirror_stale: false
+    ocr_quality: "ok"
+    ocr_quality_reason: ""
+    ocr_reattempted: false
+    last_verified: "2024-03-01T00:00:00"
+
+bundles: []
+
+next_id: 3
+next_bundle_id: 1

@@ -11,10 +11,10 @@ phases:
     status: done
   - id: Ф3
     scope: "scripts/scan_case_state.py — сканер ФС vs index.yaml для update-index Ф1"
-    status: in-progress
+    status: done
   - id: Ф4
     scope: "scripts/prepare_intake_workdir.py — распаковка архивов + preview-OCR для intake/add-evidence/add-opponent Ф1"
-    status: pending
+    status: in-progress
   - id: Ф5
     scope: "scripts/apply_intake_plan.py — детерминированный Ф3 apply для intake/add-evidence/add-opponent"
     status: pending
