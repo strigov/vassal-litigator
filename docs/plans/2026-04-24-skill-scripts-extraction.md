@@ -14,10 +14,10 @@ phases:
     status: done
   - id: Ф4
     scope: "scripts/prepare_intake_workdir.py — распаковка архивов + preview-OCR для intake/add-evidence/add-opponent Ф1"
-    status: in-progress
+    status: done
   - id: Ф5
     scope: "scripts/apply_intake_plan.py — детерминированный Ф3 apply для intake/add-evidence/add-opponent"
-    status: pending
+    status: in-progress
 ---
 
 ## Goal

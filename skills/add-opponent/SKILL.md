@@ -32,9 +32,13 @@ description: >
 ## Фаза 1 — Plan (main-Sonnet + Haiku-subagent)
 
 1. Прочитай `.vassal/case.yaml`, `.vassal/index.yaml` и список файлов в `Входящие документы/`.
-2. Подготовь `{{work_dir}}`: распакуй архивы, извлеки предварительный текст, собери короткие OCR-фрагменты для классификации.
+2. Подготовь `{{work_dir}}`, выполнив скрипт:
+   ```bash
+   python3 "$PLUGIN_ROOT/scripts/prepare_intake_workdir.py" "$INCOMING_DIR" --work-dir "$WORK_DIR"
+   ```
+   Распарси JSON: поля `files[]` (каждый элемент: `source_path`, `extracted_text_preview`, `needs_image_to_pdf`, `archive_src`), `archives_unpacked`, `unsupported`. Если `unsupported[]` не пуст — сообщи Сюзерену о неподдерживаемых или проблемных архивах. Передай список `files[]` в Haiku-subagent для планирования.
 3. Вызови Haiku-subagent по контракту 3.3A:
-   - передай `case_root`, `work_dir`, `opponent_hint`, список файлов и первые 500 символов извлечённого текста;
+   - передай `case_root`, `work_dir`, `opponent_hint`, список `files[]` из JSON скрипта (поля `source_path` и `extracted_text_preview`);
    - запроси YAML `file/new_name/doc_type`;
    - `Task`: `subagent_type: "general-purpose"`, `model: "haiku"`, `description` 3-5 слов.
 4. Main-Sonnet по результату Haiku сам:

@@ -39,14 +39,14 @@ Main-Sonnet не вставляет в subagent prompt полные тексты
 ## Фаза 1 — Plan (main-Sonnet + Haiku-subagent)
 
 1. Прочитай `.vassal/case.yaml`, `.vassal/index.yaml` и список файлов в `Входящие документы/`. Не показывай Сюзерену сырые тексты документов на этом шаге.
-2. Подготовь рабочую область `{{work_dir}}`:
-   - распакуй архивы во временные подпапки;
-   - извлеки предварительный текст из PDF/изображений/`docx`/`xlsx`;
-   - для изображений пометь будущую конверсию в PDF;
-   - сохрани промежуточные OCR-артефакты только в `{{work_dir}}`.
+2. Подготовь рабочую область `{{work_dir}}`, выполнив скрипт:
+   ```bash
+   python3 "$PLUGIN_ROOT/scripts/prepare_intake_workdir.py" "$INCOMING_DIR" --work-dir "$WORK_DIR"
+   ```
+   Распарси JSON: поля `files[]` (каждый элемент: `source_path`, `extracted_text_preview`, `needs_image_to_pdf`, `archive_src`), `archives_unpacked`, `unsupported`. Если `unsupported[]` не пуст — сообщи Сюзерену о неподдерживаемых или проблемных архивах. Передай список `files[]` в Haiku-subagent для планирования.
 3. Для механической классификации собери prompt субагента по контракту 3.3A из [shared/subagent-dispatch.md](/Users/strigov/Documents/Claude/Projects/Suzerain/plugins/vassal-litigator/shared/subagent-dispatch.md):
    - `ROLE`: обработчик файлов в скилле `intake`;
-   - `CONTEXT`: `case_root`, `raw/work_dir`, список файлов и первые 500 символов извлечённого текста на файл;
+   - `CONTEXT`: `case_root`, `work_dir`, список `files[]` из JSON скрипта (поля `source_path` и `extracted_text_preview`);
    - `TASK`: вернуть `new_name` и `doc_type`;
    - `OUTPUT`: чистый YAML-массив `file/new_name/doc_type`.
 4. Вызови `Task` с параметрами `subagent_type: "general-purpose"`, `model: "haiku"`, `description` длиной 3-5 слов. Если файлов больше 20 — бей на несколько вызовов, но формат OUTPUT держи одинаковым.
