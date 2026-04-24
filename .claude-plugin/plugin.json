@@ -1,7 +1,7 @@
 {
   "name": "vassal-litigator",
   "description": "Вассал (Claude Code edition): Claude-only плагин для ведения судебных дел. Файловый пайплайн идёт через Haiku-subagent, аналитика — через Opus-subagent, оформление .docx — через Sonnet-subagent и arbitrum-docx.",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "author": {
     "name": "Ian Strigov"
   },

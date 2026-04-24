@@ -1,3 +1,24 @@
+## [0.7.0] — 2026-04-24
+
+### Added
+
+- `scripts/classify_ocr_quality.py` — единый классификатор OCR quality (вынесен из скиллов).
+- `scripts/validate_opus_output.py` — валидатор OUTPUT-контрактов скиллов.
+- `scripts/scan_case_state.py` — сканер файловой системы vs `index.yaml`.
+- `scripts/prepare_intake_workdir.py` — распаковка входящих архивов + preview-OCR.
+- `scripts/apply_intake_plan.py` — детерминированный apply для `intake` / `add-evidence` / `add-opponent`.
+
+### Changed
+
+- Детерминированная логика (парсинг, файловые операции, валидация) вынесена из SKILL.md в Python-скрипты; агенту оставлено только LLM-суждение.
+
+### Fixed
+
+- Восстановлено поле `name=vassal-litigator` в `.claude-plugin/plugin.json` (было сброшено при зачистке v0.6.0).
+- Упрощён README: убраны устаревшие разделы про Codex.
+
+---
+
 ## [0.6.0] — 2026-04-23
 
 ### Breaking
