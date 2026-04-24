@@ -1,7 +1,7 @@
 ---
 slug: skill-scripts-extraction-p1
 created: 2026-04-24
-status: in-progress
+status: done
 phases:
   - id: Ф1
     scope: "scripts/classify_ocr_quality.py + tests/unit scaffold — single source of truth for OCR quality table"
@@ -17,7 +17,7 @@ phases:
     status: done
   - id: Ф5
     scope: "scripts/apply_intake_plan.py — детерминированный Ф3 apply для intake/add-evidence/add-opponent"
-    status: in-progress
+    status: done
 ---
 
 ## Goal
