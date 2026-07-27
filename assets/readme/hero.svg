@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="430" viewBox="0 0 1200 430"
+     role="img" aria-labelledby="title desc">
+  <title id="title">Вассал-Литигатор</title>
+  <desc id="desc">Рабочая система для ведения судебного дела: от входящих материалов до позиции, заседания и обжалования.</desc>
+
+  <rect width="1200" height="430" rx="28" fill="#F4EFE6"/>
+  <path d="M0 28C0 12.5 12.5 0 28 0H1200V10H0V28Z" fill="#7C2135"/>
+
+  <g id="editorial-frame" fill="none" stroke="#D7CCBC">
+    <path d="M56 58H678"/>
+    <path d="M56 372H678"/>
+    <path d="M702 58V372"/>
+  </g>
+
+  <g id="title-block" transform="translate(58 60)">
+    <text x="0" y="18"
+          fill="#7C2135"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="18" font-weight="700" letter-spacing="3">CLAUDE COWORK · СУДЕБНАЯ РАБОТА</text>
+
+    <text x="0" y="103"
+          fill="#15243B"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="70" font-weight="700">Вассал-</text>
+    <text x="0" y="172"
+          fill="#15243B"
+          font-family="Georgia, 'Times New Roman', serif"
+          font-size="70" font-weight="700">Литигатор</text>
+
+    <text x="2" y="221"
+          fill="#424B59"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="24">Собирает материалы в управляемое дело.</text>
+    <text x="2" y="254"
+          fill="#424B59"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="24">Юрист сохраняет контроль над решениями.</text>
+
+    <g transform="translate(0 290)"
+       font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+       font-size="18" font-weight="650">
+      <rect width="132" height="42" rx="21" fill="#15243B"/>
+      <text x="66" y="27" fill="#FFFFFF" text-anchor="middle">ДОКУМЕНТЫ</text>
+      <rect x="144" width="112" height="42" rx="21" fill="#E5D9C8"/>
+      <text x="200" y="27" fill="#15243B" text-anchor="middle">АНАЛИЗ</text>
+      <rect x="268" width="110" height="42" rx="21" fill="#E5D9C8"/>
+      <text x="323" y="27" fill="#15243B" text-anchor="middle">ПОЗИЦИЯ</text>
+      <rect x="390" width="151" height="42" rx="21" fill="#E5D9C8"/>
+      <text x="465.5" y="27" fill="#15243B" text-anchor="middle">ЗАСЕДАНИЕ</text>
+    </g>
+  </g>
+
+  <g id="case-file" transform="translate(755 42)">
+    <rect x="37" y="29" width="354" height="331" rx="12" fill="#D7CCBC" transform="rotate(3 214 194)"/>
+    <rect x="18" y="19" width="354" height="331" rx="12" fill="#E5D9C8" transform="rotate(-2 195 184)"/>
+    <rect x="0" y="8" width="354" height="331" rx="12" fill="#FFFDFC" stroke="#BFAF99" stroke-width="2"/>
+
+    <path d="M0 20C0 13.4 5.4 8 12 8H342C348.6 8 354 13.4 354 20V64H0V20Z" fill="#15243B"/>
+    <text x="24" y="43"
+          fill="#FFFFFF"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+          font-size="18" font-weight="700" letter-spacing="2">РАБОЧЕЕ ДОСЬЕ</text>
+    <text x="331" y="43"
+          fill="#D9B765"
+          font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+          font-size="17" text-anchor="end">v0.7</text>
+
+    <text x="24" y="101"
+          fill="#7C2135"
+          font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+          font-size="17" font-weight="700">МАРШРУТ ДЕЛА</text>
+
+    <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+      <g transform="translate(24 122)">
+        <circle cx="13" cy="13" r="13" fill="#7C2135"/>
+        <text x="13" y="19" fill="#FFFFFF" font-size="17" font-weight="700" text-anchor="middle">1</text>
+        <text x="44" y="20" fill="#15243B" font-size="21" font-weight="650">Документы приняты</text>
+        <path d="M13 29V51" stroke="#CDBFAA" stroke-width="2"/>
+      </g>
+      <g transform="translate(24 176)">
+        <circle cx="13" cy="13" r="13" fill="#7C2135"/>
+        <text x="13" y="19" fill="#FFFFFF" font-size="17" font-weight="700" text-anchor="middle">2</text>
+        <text x="44" y="20" fill="#15243B" font-size="21" font-weight="650">Факты и сроки сверены</text>
+        <path d="M13 29V51" stroke="#CDBFAA" stroke-width="2"/>
+      </g>
+      <g transform="translate(24 230)">
+        <circle cx="13" cy="13" r="13" fill="#7C2135"/>
+        <text x="13" y="19" fill="#FFFFFF" font-size="17" font-weight="700" text-anchor="middle">3</text>
+        <text x="44" y="20" fill="#15243B" font-size="21" font-weight="650">Риски и позиция собраны</text>
+        <path d="M13 29V51" stroke="#CDBFAA" stroke-width="2"/>
+      </g>
+      <g transform="translate(24 284)">
+        <circle cx="13" cy="13" r="13" fill="#C69A4B"/>
+        <path d="M7 13L11 17L19 9" fill="none" stroke="#15243B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="44" y="20" fill="#15243B" font-size="21" font-weight="650">Следующий шаг — у юриста</text>
+      </g>
+    </g>
+
+    <rect x="268" y="82" width="62" height="25" rx="4" fill="#F0E3C4"/>
+    <text x="299" y="100"
+          fill="#7C2135"
+          font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+          font-size="14" font-weight="700" text-anchor="middle">ПРИМЕР</text>
+  </g>
+</svg>
